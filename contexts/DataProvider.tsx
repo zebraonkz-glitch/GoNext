@@ -1,13 +1,16 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useSQLiteContext } from 'expo-sqlite';
 
+import * as photoRepo from '../db/photos';
 import * as placeRepo from '../db/places';
 import * as tripPlaceRepo from '../db/tripPlaces';
 import * as tripRepo from '../db/trips';
+import { deletePhoto, deletePhotoFile, savePhotoFromUri } from '../services/photos';
 import type {
   CreatePlaceInput,
   CreateTripInput,
   CreateTripPlaceInput,
+  Photo,
   Place,
   Trip,
   TripPlace,
@@ -27,6 +30,9 @@ interface DataContextValue {
   editPlace: (id: string, input: UpdatePlaceInput) => Promise<Place | null>;
   removePlace: (id: string) => Promise<boolean>;
   getPlace: (id: string) => Promise<Place | null>;
+  getPlacePhotos: (placeId: string) => Promise<Photo[]>;
+  addPlacePhoto: (placeId: string, sourceUri: string) => Promise<Photo>;
+  removePlacePhoto: (photoId: string) => Promise<boolean>;
   addTrip: (input: CreateTripInput) => Promise<Trip>;
   editTrip: (id: string, input: UpdateTripInput) => Promise<Trip | null>;
   removeTrip: (id: string) => Promise<boolean>;
@@ -90,6 +96,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const removePlace = useCallback(
     async (id: string) => {
+      const photos = await photoRepo.deletePhotosByEntity(db, 'place', id);
+      for (const photo of photos) {
+        await deletePhotoFile(photo);
+      }
+
       const removed = await placeRepo.deletePlace(db, id);
       if (removed) {
         await refreshPlaces();
@@ -100,6 +111,21 @@ export function DataProvider({ children }: { children: ReactNode }) {
   );
 
   const getPlace = useCallback((id: string) => placeRepo.getPlaceById(db, id), [db]);
+
+  const getPlacePhotos = useCallback(
+    (placeId: string) => photoRepo.getPhotosByEntity(db, 'place', placeId),
+    [db]
+  );
+
+  const addPlacePhoto = useCallback(
+    async (placeId: string, sourceUri: string) => savePhotoFromUri(db, sourceUri, 'place', placeId),
+    [db]
+  );
+
+  const removePlacePhoto = useCallback(
+    async (photoId: string) => deletePhoto(db, photoId),
+    [db]
+  );
 
   const addTrip = useCallback(
     async (input: CreateTripInput) => {
@@ -170,6 +196,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
       editPlace,
       removePlace,
       getPlace,
+      getPlacePhotos,
+      addPlacePhoto,
+      removePlacePhoto,
       addTrip,
       editTrip,
       removeTrip,
@@ -192,6 +221,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
       editPlace,
       removePlace,
       getPlace,
+      getPlacePhotos,
+      addPlacePhoto,
+      removePlacePhoto,
       addTrip,
       editTrip,
       removeTrip,

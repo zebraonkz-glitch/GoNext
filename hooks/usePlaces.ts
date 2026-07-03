@@ -1,5 +1,5 @@
 import { useData } from '../contexts/DataProvider';
-import type { CreatePlaceInput, Place, UpdatePlaceInput } from '../types';
+import type { CreatePlaceInput, Photo, Place, UpdatePlaceInput } from '../types';
 
 export function usePlaces() {
   const {
@@ -10,6 +10,9 @@ export function usePlaces() {
     editPlace,
     removePlace,
     getPlace,
+    getPlacePhotos,
+    addPlacePhoto,
+    removePlacePhoto,
   } = useData();
 
   return {
@@ -20,7 +23,10 @@ export function usePlaces() {
     editPlace,
     removePlace,
     getPlace,
+    getPlacePhotos,
+    addPlacePhoto,
+    removePlacePhoto,
   };
 }
 
-export type { CreatePlaceInput, Place, UpdatePlaceInput };
+export type { CreatePlaceInput, Photo, Place, UpdatePlaceInput };

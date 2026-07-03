@@ -61,6 +61,20 @@ export async function deletePhotoRecord(db: SQLiteDatabase, id: string): Promise
   return photo;
 }
 
+export async function getFirstPhotoForPlace(
+  db: SQLiteDatabase,
+  placeId: string
+): Promise<Photo | null> {
+  const row = await db.getFirstAsync<Parameters<typeof mapPhotoRow>[0]>(
+    `SELECT * FROM photos
+     WHERE entityType = 'place' AND entityId = ?
+     ORDER BY createdAt ASC
+     LIMIT 1`,
+    placeId
+  );
+  return row ? mapPhotoRow(row) : null;
+}
+
 export async function deletePhotosByEntity(
   db: SQLiteDatabase,
   entityType: PhotoEntityType,

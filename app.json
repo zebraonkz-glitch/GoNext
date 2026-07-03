@@ -29,7 +29,20 @@
     },
     "plugins": [
       "expo-router",
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "GoNext использует геолокацию для указания координат мест."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "GoNext использует галерею для прикрепления фотографий к местам.",
+          "cameraPermission": "GoNext использует камеру для съёмки фотографий мест."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
