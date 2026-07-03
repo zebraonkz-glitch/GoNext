@@ -1,6 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 import { Card, Chip, ProgressBar, Text } from 'react-native-paper';
 
+import { paperCardStyle } from '../../constants/ui';
+
 import type { Trip, TripStats } from '../../types';
 import { formatDateRange } from '../../utils/dates';
 
@@ -14,7 +16,7 @@ export function TripCard({ trip, stats, onPress }: TripCardProps) {
   const progress = stats.total > 0 ? stats.visited / stats.total : 0;
 
   return (
-    <Card style={[styles.card, trip.current && styles.currentCard]} onPress={onPress}>
+    <Card style={[styles.card, paperCardStyle, trip.current && styles.currentCard]} onPress={onPress}>
       <Card.Content style={styles.content}>
         <View style={styles.header}>
           <Text variant="titleMedium" style={styles.title}>

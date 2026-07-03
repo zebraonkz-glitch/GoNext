@@ -1,6 +1,8 @@
 import { Image, StyleSheet, View } from 'react-native';
 import { Card, Chip, IconButton, Text } from 'react-native-paper';
 
+import { paperCardStyle } from '../../constants/ui';
+
 import type { Photo, Place } from '../../types';
 
 interface PlaceCardProps {
@@ -12,7 +14,7 @@ interface PlaceCardProps {
 
 export function PlaceCard({ place, thumbnail, onPress, onDelete }: PlaceCardProps) {
   return (
-    <Card style={styles.card} onPress={onPress}>
+    <Card style={[styles.card, paperCardStyle]} onPress={onPress}>
       <View style={styles.row}>
         {thumbnail ? (
           <Image source={{ uri: thumbnail.filePath }} style={styles.thumbnail} />

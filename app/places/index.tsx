@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { FAB, Searchbar } from 'react-native-paper';
 
+import { paperInputStyle, paperSearchbarStyle } from '../../constants/ui';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadingIndicator } from '../../components/LoadingIndicator';
@@ -79,7 +80,8 @@ export default function PlacesListScreen() {
               placeholder="Поиск по названию"
               value={searchQuery}
               onChangeText={setSearchQuery}
-              style={styles.searchbar}
+              style={[styles.searchbar, paperSearchbarStyle]}
+              inputStyle={paperInputStyle}
             />
             {filteredPlaces.length === 0 ? (
               <EmptyState

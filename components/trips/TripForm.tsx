@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
-import { Button, Switch, Text, TextInput } from 'react-native-paper';
+import { Button, Switch, Text } from 'react-native-paper';
 
+import { FormPanel, PaperTextInput } from '../PaperTextInput';
 import { DatePickerField } from './DatePickerField';
 import type { CreateTripInput } from '../../types';
 
@@ -52,9 +53,9 @@ export function TripForm({
   };
 
   return (
-    <View style={styles.container}>
-      <TextInput label="Название" value={title} onChangeText={setTitle} mode="outlined" />
-      <TextInput
+    <FormPanel>
+      <PaperTextInput label="Название" value={title} onChangeText={setTitle} mode="outlined" />
+      <PaperTextInput
         label="Описание"
         value={description}
         onChangeText={setDescription}
@@ -82,15 +83,11 @@ export function TripForm({
           Удалить поездку
         </Button>
       ) : null}
-    </View>
+    </FormPanel>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    gap: 12,
-  },
   multiline: {
     minHeight: 100,
   },

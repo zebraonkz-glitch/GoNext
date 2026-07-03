@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { Text } from 'react-native-paper';
 
+import { UI } from '../../constants/ui';
 import type { DecimalDegrees } from '../../types';
 import { hasValidCoordinates } from '../../utils/coordinates';
 
@@ -51,7 +52,7 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     borderRadius: 8,
-    backgroundColor: '#e8e8e8',
+    backgroundColor: UI.surfaceMuted,
     justifyContent: 'center',
     alignItems: 'center',
   },

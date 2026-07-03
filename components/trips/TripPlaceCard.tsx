@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Card, IconButton, Switch, Text, TextInput } from 'react-native-paper';
+import { Card, IconButton, Switch, Text } from 'react-native-paper';
 
+import { PaperTextInput } from '../PaperTextInput';
 import { PhotoGallery } from '../places/PhotoGallery';
+import { UI, paperCardStyle } from '../../constants/ui';
 import type { Photo, TripPlaceWithPlace } from '../../types';
 import { formatDate } from '../../utils/dates';
 
@@ -44,7 +46,7 @@ export function TripPlaceCard({
   }, [item.notes]);
 
   return (
-    <Card style={[styles.card, item.visited && styles.visitedCard]}>
+    <Card style={[styles.card, paperCardStyle, item.visited && styles.visitedCard]}>
       <Card.Content style={styles.content}>
         <View style={styles.header}>
           <Text variant="labelLarge" style={styles.order}>
@@ -79,7 +81,7 @@ export function TripPlaceCard({
           </View>
         ) : null}
 
-        <TextInput
+        <PaperTextInput
           label="Заметки"
           value={notes}
           onChangeText={setNotes}
@@ -107,7 +109,7 @@ const styles = StyleSheet.create({
     marginVertical: 6,
   },
   visitedCard: {
-    backgroundColor: '#f3f8f3',
+    backgroundColor: UI.visitedSurface,
   },
   content: {
     gap: 12,

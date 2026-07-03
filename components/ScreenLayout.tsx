@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 
+import { UI } from '../constants/ui';
 interface ScreenLayoutProps {
   title: string;
   children: ReactNode;
@@ -30,6 +31,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   header: {
-    backgroundColor: 'rgba(255, 255, 255, 0.88)',
+    backgroundColor: UI.headerOverlay,
   },
 });

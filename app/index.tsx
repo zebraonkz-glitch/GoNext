@@ -4,6 +4,7 @@ import { Appbar, Button } from 'react-native-paper';
 
 import { LoadingIndicator } from '../components/LoadingIndicator';
 import { useData } from '../contexts/DataProvider';
+import { UI } from '../constants/ui';
 
 export default function HomeScreen() {
   const { isLoading } = useData();
@@ -42,7 +43,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   header: {
-    backgroundColor: 'rgba(255, 255, 255, 0.88)',
+    backgroundColor: UI.headerOverlay,
   },
   menu: {
     flex: 1,

@@ -1,10 +1,13 @@
 import { useState } from 'react';
 import { Alert, Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { Button, IconButton, Menu, Switch, Text, TextInput } from 'react-native-paper';
+import { Button, IconButton, Menu, Switch, Text } from 'react-native-paper';
+
+import { FormPanel, PaperTextInput } from '../PaperTextInput';
 
 import { PhotoGallery } from './PhotoGallery';
 import { PlaceMap } from './PlaceMap';
+import { UI } from '../../constants/ui';
 import { getCurrentCoordinates } from '../../services/location';
 import { openPlaceOnMap } from '../../services/maps';
 import type { CreatePlaceInput, Photo } from '../../types';
@@ -149,9 +152,10 @@ export function PlaceForm({
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-      <TextInput label="Название" value={name} onChangeText={setName} mode="outlined" />
-      <TextInput
+    <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+      <FormPanel>
+      <PaperTextInput label="Название" value={name} onChangeText={setName} mode="outlined" />
+      <PaperTextInput
         label="Описание"
         value={description}
         onChangeText={setDescription}
@@ -174,7 +178,7 @@ export function PlaceForm({
         Координаты
       </Text>
       <View style={styles.coordsRow}>
-        <TextInput
+        <PaperTextInput
           label="Широта"
           value={latitudeText}
           onChangeText={setLatitudeText}
@@ -182,7 +186,7 @@ export function PlaceForm({
           keyboardType="numeric"
           style={styles.coordInput}
         />
-        <TextInput
+        <PaperTextInput
           label="Долгота"
           value={longitudeText}
           onChangeText={setLongitudeText}
@@ -258,14 +262,14 @@ export function PlaceForm({
           Удалить
         </Button>
       ) : null}
+      </FormPanel>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    gap: 12,
+  scroll: {
+    paddingBottom: 16,
   },
   multiline: {
     minHeight: 100,
@@ -315,6 +319,6 @@ const styles = StyleSheet.create({
     top: -8,
     right: -8,
     margin: 0,
-    backgroundColor: '#fff',
+    backgroundColor: UI.surface,
   },
 });

@@ -3,6 +3,8 @@ import { Platform, StyleSheet, View } from 'react-native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { Button, Modal, Portal, Text } from 'react-native-paper';
 
+import { UI, paperInputStyle } from '../../constants/ui';
+
 import { formatDate, parseISODate, toISODateString } from '../../utils/dates';
 
 interface DatePickerFieldProps {
@@ -42,7 +44,7 @@ export function DatePickerField({ label, value, onChange }: DatePickerFieldProps
     <View style={styles.container}>
       <Text variant="labelLarge">{label}</Text>
       <View style={styles.row}>
-        <Button mode="outlined" onPress={openPicker} style={styles.button}>
+        <Button mode="outlined" onPress={openPicker} style={[styles.button, paperInputStyle]}>
           {formatDate(value)}
         </Button>
         {value ? (
@@ -89,7 +91,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   modal: {
-    backgroundColor: '#fff',
+    backgroundColor: UI.surface,
     margin: 24,
     borderRadius: 12,
     padding: 16,

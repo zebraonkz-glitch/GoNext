@@ -1,24 +1,17 @@
 import { Stack } from 'expo-router';
 import { SQLiteProvider } from 'expo-sqlite';
 import { StatusBar } from 'expo-status-bar';
-import { PaperProvider, MD3LightTheme } from 'react-native-paper';
+import { PaperProvider } from 'react-native-paper';
 
 import { AppBackground } from '../components/AppBackground';
 import { DataProvider } from '../contexts/DataProvider';
 import { DATABASE_NAME } from '../constants';
 import { initDatabase } from '../db/database';
-
-const theme = {
-  ...MD3LightTheme,
-  colors: {
-    ...MD3LightTheme.colors,
-    background: 'transparent',
-  },
-};
+import { appTheme } from '../theme/paper';
 
 export default function RootLayout() {
   return (
-    <PaperProvider theme={theme}>
+    <PaperProvider theme={appTheme}>
       <SQLiteProvider databaseName={DATABASE_NAME} onInit={initDatabase}>
         <DataProvider>
           <AppBackground>
