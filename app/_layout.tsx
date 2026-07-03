@@ -5,6 +5,7 @@ import { PaperProvider } from 'react-native-paper';
 
 import { AppBackground } from '../components/AppBackground';
 import { DataProvider } from '../contexts/DataProvider';
+import { SnackbarProvider } from '../contexts/SnackbarContext';
 import { DATABASE_NAME } from '../constants';
 import { initDatabase } from '../db/database';
 import { appTheme } from '../theme/paper';
@@ -13,8 +14,9 @@ export default function RootLayout() {
   return (
     <PaperProvider theme={appTheme}>
       <SQLiteProvider databaseName={DATABASE_NAME} onInit={initDatabase}>
-        <DataProvider>
-          <AppBackground>
+        <SnackbarProvider>
+          <DataProvider>
+            <AppBackground>
             <StatusBar style="auto" />
             <Stack
               screenOptions={{
@@ -23,7 +25,8 @@ export default function RootLayout() {
               }}
             />
           </AppBackground>
-        </DataProvider>
+          </DataProvider>
+        </SnackbarProvider>
       </SQLiteProvider>
     </PaperProvider>
   );

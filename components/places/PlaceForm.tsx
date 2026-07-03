@@ -7,10 +7,10 @@ import { FormPanel, PaperTextInput } from '../PaperTextInput';
 
 import { PhotoGallery } from './PhotoGallery';
 import { PlaceMap } from './PlaceMap';
+import { MapActionButtons } from './MapActionButtons';
 import { PlaceCompanionsSection } from '../companions/PlaceCompanionsSection';
 import { UI } from '../../constants/ui';
 import { getCurrentCoordinates } from '../../services/location';
-import { openPlaceOnMap } from '../../services/maps';
 import type { Companion, CreatePlaceInput, Photo } from '../../types';
 import {
   formatCoordinate,
@@ -75,14 +75,6 @@ export function PlaceForm({
     }
   };
 
-  const handleOpenMap = async () => {
-    if (!hasValidCoordinates(latitude, longitude)) {
-      Alert.alert('Карта', 'Укажите корректные координаты');
-      return;
-    }
-    await openPlaceOnMap(latitude!, longitude!, name || 'Место');
-  };
-
   const addPendingPhoto = async (picker: () => Promise<ImagePicker.ImagePickerResult>) => {
     setPhotoMenuVisible(false);
     const result = await picker();
@@ -135,6 +127,15 @@ export function PlaceForm({
 
     if (longitudeText.trim() && longitude === null) {
       Alert.alert('Ошибка', 'Некорректная долгота');
+      return;
+    }
+
+    if (
+      latitudeText.trim() &&
+      longitudeText.trim() &&
+      !hasValidCoordinates(latitude, longitude)
+    ) {
+      Alert.alert('Ошибка', 'Широта должна быть от -90 до 90, долгота — от -180 до 180');
       return;
     }
 
@@ -213,9 +214,7 @@ export function PlaceForm({
       </Button>
 
       <PlaceMap dd={dd} title={name} />
-      <Button mode="outlined" icon="map-marker" onPress={() => void handleOpenMap()} style={styles.button}>
-        Открыть на карте
-      </Button>
+      <MapActionButtons dd={dd} label={name || 'Место'} style={styles.mapActions} />
 
       {placeId && onAddPhoto && onRemovePhoto ? (
         <PhotoGallery photos={photos} onAdd={onAddPhoto} onDelete={onRemovePhoto} />
@@ -273,7 +272,7 @@ export function PlaceForm({
       </Button>
 
       {onDelete ? (
-        <Button mode="outlined" textColor="#b00020" onPress={onDelete} style={styles.button}>
+        <Button mode="outlined" textColor={UI.error} onPress={onDelete} style={styles.button}>
           Удалить
         </Button>
       ) : null}
@@ -305,6 +304,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   button: {
+    marginTop: 4,
+  },
+  mapActions: {
     marginTop: 4,
   },
   pendingPhotos: {

@@ -4,8 +4,11 @@ import { UI } from '../constants/ui';
 
 export const appTheme: MD3Theme = {
   ...MD3LightTheme,
+  roundness: UI.radius,
   colors: {
     ...MD3LightTheme.colors,
+    primary: UI.primary,
+    error: UI.error,
     background: 'transparent',
     surface: UI.surface,
     surfaceVariant: UI.surfaceMuted,

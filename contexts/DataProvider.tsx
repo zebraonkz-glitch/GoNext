@@ -9,6 +9,8 @@ import * as tripPlaceRepo from '../db/tripPlaces';
 import * as tripRepo from '../db/trips';
 import { clearAllData as resetDatabase } from '../db/reset';
 import { deletePhoto, deletePhotoFile, savePhotoFromUri } from '../services/photos';
+import { useSnackbar } from './SnackbarContext';
+import { getDbErrorMessage } from '../utils/errors';
 import type {
   Companion,
   CreateCompanionInput,
@@ -69,34 +71,49 @@ const DataContext = createContext<DataContextValue | null>(null);
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const db = useSQLiteContext();
+  const { showError } = useSnackbar();
   const [places, setPlaces] = useState<Place[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [companions, setCompanions] = useState<Companion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshPlaces = useCallback(async () => {
-    const data = await placeRepo.getAllPlaces(db);
-    setPlaces(data);
-  }, [db]);
+    try {
+      const data = await placeRepo.getAllPlaces(db);
+      setPlaces(data);
+    } catch (error) {
+      showError(getDbErrorMessage(error));
+    }
+  }, [db, showError]);
 
   const refreshTrips = useCallback(async () => {
-    const data = await tripRepo.getAllTrips(db);
-    setTrips(data);
-  }, [db]);
+    try {
+      const data = await tripRepo.getAllTrips(db);
+      setTrips(data);
+    } catch (error) {
+      showError(getDbErrorMessage(error));
+    }
+  }, [db, showError]);
 
   const refreshCompanions = useCallback(async () => {
-    const data = await companionRepo.getAllCompanions(db);
-    setCompanions(data);
-  }, [db]);
+    try {
+      const data = await companionRepo.getAllCompanions(db);
+      setCompanions(data);
+    } catch (error) {
+      showError(getDbErrorMessage(error));
+    }
+  }, [db, showError]);
 
   const refreshAll = useCallback(async () => {
     setIsLoading(true);
     try {
       await Promise.all([refreshPlaces(), refreshTrips(), refreshCompanions()]);
+    } catch (error) {
+      showError(getDbErrorMessage(error));
     } finally {
       setIsLoading(false);
     }
-  }, [refreshPlaces, refreshTrips, refreshCompanions]);
+  }, [refreshPlaces, refreshTrips, refreshCompanions, showError]);
 
   useEffect(() => {
     void refreshAll();
@@ -104,36 +121,51 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const addPlace = useCallback(
     async (input: CreatePlaceInput) => {
-      const place = await placeRepo.createPlace(db, input);
-      await refreshPlaces();
-      return place;
+      try {
+        const place = await placeRepo.createPlace(db, input);
+        await refreshPlaces();
+        return place;
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
     },
-    [db, refreshPlaces]
+    [db, refreshPlaces, showError]
   );
 
   const editPlace = useCallback(
     async (id: string, input: UpdatePlaceInput) => {
-      const place = await placeRepo.updatePlace(db, id, input);
-      await refreshPlaces();
-      return place;
+      try {
+        const place = await placeRepo.updatePlace(db, id, input);
+        await refreshPlaces();
+        return place;
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
     },
-    [db, refreshPlaces]
+    [db, refreshPlaces, showError]
   );
 
   const removePlace = useCallback(
     async (id: string) => {
-      const photos = await photoRepo.deletePhotosByEntity(db, 'place', id);
-      for (const photo of photos) {
-        await deletePhotoFile(photo);
-      }
+      try {
+        const photos = await photoRepo.deletePhotosByEntity(db, 'place', id);
+        for (const photo of photos) {
+          await deletePhotoFile(photo);
+        }
 
-      const removed = await placeRepo.deletePlace(db, id);
-      if (removed) {
-        await refreshPlaces();
+        const removed = await placeRepo.deletePlace(db, id);
+        if (removed) {
+          await refreshPlaces();
+        }
+        return removed;
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
       }
-      return removed;
     },
-    [db, refreshPlaces]
+    [db, refreshPlaces, showError]
   );
 
   const getPlace = useCallback((id: string) => placeRepo.getPlaceById(db, id), [db]);
@@ -144,50 +176,79 @@ export function DataProvider({ children }: { children: ReactNode }) {
   );
 
   const addPlacePhoto = useCallback(
-    async (placeId: string, sourceUri: string) => savePhotoFromUri(db, sourceUri, 'place', placeId),
-    [db]
+    async (placeId: string, sourceUri: string) => {
+      try {
+        return await savePhotoFromUri(db, sourceUri, 'place', placeId);
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
+    },
+    [db, showError]
   );
 
   const removePlacePhoto = useCallback(
-    async (photoId: string) => deletePhoto(db, photoId),
-    [db]
+    async (photoId: string) => {
+      try {
+        return await deletePhoto(db, photoId);
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
+    },
+    [db, showError]
   );
 
   const addTrip = useCallback(
     async (input: CreateTripInput) => {
-      const trip = await tripRepo.createTrip(db, input);
-      await refreshTrips();
-      return trip;
+      try {
+        const trip = await tripRepo.createTrip(db, input);
+        await refreshTrips();
+        return trip;
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
     },
-    [db, refreshTrips]
+    [db, refreshTrips, showError]
   );
 
   const editTrip = useCallback(
     async (id: string, input: UpdateTripInput) => {
-      const trip = await tripRepo.updateTrip(db, id, input);
-      await refreshTrips();
-      return trip;
+      try {
+        const trip = await tripRepo.updateTrip(db, id, input);
+        await refreshTrips();
+        return trip;
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
     },
-    [db, refreshTrips]
+    [db, refreshTrips, showError]
   );
 
   const removeTrip = useCallback(
     async (id: string) => {
-      const tripPlaces = await tripPlaceRepo.getTripPlacesByTripId(db, id);
-      for (const tripPlace of tripPlaces) {
-        const photos = await photoRepo.deletePhotosByEntity(db, 'trip_place', tripPlace.id);
-        for (const photo of photos) {
-          await deletePhotoFile(photo);
+      try {
+        const tripPlaces = await tripPlaceRepo.getTripPlacesByTripId(db, id);
+        for (const tripPlace of tripPlaces) {
+          const photos = await photoRepo.deletePhotosByEntity(db, 'trip_place', tripPlace.id);
+          for (const photo of photos) {
+            await deletePhotoFile(photo);
+          }
         }
-      }
 
-      const removed = await tripRepo.deleteTrip(db, id);
-      if (removed) {
-        await refreshTrips();
+        const removed = await tripRepo.deleteTrip(db, id);
+        if (removed) {
+          await refreshTrips();
+        }
+        return removed;
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
       }
-      return removed;
     },
-    [db, refreshTrips]
+    [db, refreshTrips, showError]
   );
 
   const getTrip = useCallback((id: string) => tripRepo.getTripById(db, id), [db]);
@@ -198,26 +259,44 @@ export function DataProvider({ children }: { children: ReactNode }) {
   );
 
   const addTripPlace = useCallback(
-    async (input: CreateTripPlaceInput) => tripPlaceRepo.createTripPlace(db, input),
-    [db]
+    async (input: CreateTripPlaceInput) => {
+      try {
+        return await tripPlaceRepo.createTripPlace(db, input);
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
+    },
+    [db, showError]
   );
 
   const editTripPlace = useCallback(
-    async (id: string, input: UpdateTripPlaceInput) =>
-      tripPlaceRepo.updateTripPlace(db, id, input),
-    [db]
+    async (id: string, input: UpdateTripPlaceInput) => {
+      try {
+        return await tripPlaceRepo.updateTripPlace(db, id, input);
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
+    },
+    [db, showError]
   );
 
   const removeTripPlace = useCallback(
     async (id: string) => {
-      const photos = await photoRepo.deletePhotosByEntity(db, 'trip_place', id);
-      for (const photo of photos) {
-        await deletePhotoFile(photo);
-      }
+      try {
+        const photos = await photoRepo.deletePhotosByEntity(db, 'trip_place', id);
+        for (const photo of photos) {
+          await deletePhotoFile(photo);
+        }
 
-      return tripPlaceRepo.deleteTripPlace(db, id);
+        return await tripPlaceRepo.deleteTripPlace(db, id);
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
     },
-    [db]
+    [db, showError]
   );
 
   const getNextTripPlace = useCallback(
@@ -227,9 +306,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const reorderTripPlaces = useCallback(
     async (tripId: string, orderedIds: string[]) => {
-      await tripPlaceRepo.reorderTripPlaces(db, tripId, orderedIds);
+      try {
+        await tripPlaceRepo.reorderTripPlaces(db, tripId, orderedIds);
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
     },
-    [db]
+    [db, showError]
   );
 
   const getTripPlacePhotos = useCallback(
@@ -238,43 +322,71 @@ export function DataProvider({ children }: { children: ReactNode }) {
   );
 
   const addTripPlacePhoto = useCallback(
-    async (tripPlaceId: string, sourceUri: string) =>
-      savePhotoFromUri(db, sourceUri, 'trip_place', tripPlaceId),
-    [db]
+    async (tripPlaceId: string, sourceUri: string) => {
+      try {
+        return await savePhotoFromUri(db, sourceUri, 'trip_place', tripPlaceId);
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
+    },
+    [db, showError]
   );
 
   const removeTripPlacePhoto = useCallback(
-    async (photoId: string) => deletePhoto(db, photoId),
-    [db]
+    async (photoId: string) => {
+      try {
+        return await deletePhoto(db, photoId);
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
+    },
+    [db, showError]
   );
 
   const addCompanion = useCallback(
     async (input: CreateCompanionInput) => {
-      const companion = await companionRepo.createCompanion(db, input);
-      await refreshCompanions();
-      return companion;
+      try {
+        const companion = await companionRepo.createCompanion(db, input);
+        await refreshCompanions();
+        return companion;
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
     },
-    [db, refreshCompanions]
+    [db, refreshCompanions, showError]
   );
 
   const editCompanion = useCallback(
     async (id: string, input: UpdateCompanionInput) => {
-      const companion = await companionRepo.updateCompanion(db, id, input);
-      await refreshCompanions();
-      return companion;
+      try {
+        const companion = await companionRepo.updateCompanion(db, id, input);
+        await refreshCompanions();
+        return companion;
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
     },
-    [db, refreshCompanions]
+    [db, refreshCompanions, showError]
   );
 
   const removeCompanion = useCallback(
     async (id: string) => {
-      const removed = await companionRepo.deleteCompanion(db, id);
-      if (removed) {
-        await refreshCompanions();
+      try {
+        const removed = await companionRepo.deleteCompanion(db, id);
+        if (removed) {
+          await refreshCompanions();
+        }
+        return removed;
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
       }
-      return removed;
     },
-    [db, refreshCompanions]
+    [db, refreshCompanions, showError]
   );
 
   const getCompanion = useCallback(
@@ -288,21 +400,38 @@ export function DataProvider({ children }: { children: ReactNode }) {
   );
 
   const linkCompanionToPlace = useCallback(
-    async (placeId: string, companionId: string) =>
-      placeCompanionRepo.linkCompanionToPlace(db, placeId, companionId),
-    [db]
+    async (placeId: string, companionId: string) => {
+      try {
+        return await placeCompanionRepo.linkCompanionToPlace(db, placeId, companionId);
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
+    },
+    [db, showError]
   );
 
   const unlinkCompanionFromPlace = useCallback(
-    async (placeId: string, companionId: string) =>
-      placeCompanionRepo.unlinkCompanionFromPlace(db, placeId, companionId),
-    [db]
+    async (placeId: string, companionId: string) => {
+      try {
+        return await placeCompanionRepo.unlinkCompanionFromPlace(db, placeId, companionId);
+      } catch (error) {
+        showError(getDbErrorMessage(error));
+        throw error;
+      }
+    },
+    [db, showError]
   );
 
   const clearAllData = useCallback(async () => {
-    await resetDatabase(db);
-    await refreshAll();
-  }, [db, refreshAll]);
+    try {
+      await resetDatabase(db);
+      await refreshAll();
+    } catch (error) {
+      showError(getDbErrorMessage(error));
+      throw error;
+    }
+  }, [db, refreshAll, showError]);
 
   const value = useMemo<DataContextValue>(
     () => ({

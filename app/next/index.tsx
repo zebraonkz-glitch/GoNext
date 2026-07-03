@@ -1,27 +1,29 @@
 import { type Href, router, useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
-import { Button, Card, Snackbar, Text } from 'react-native-paper';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { Button, Card, Text } from 'react-native-paper';
 
+import { MapActionButtons } from '../../components/places/MapActionButtons';
 import { PlaceMap } from '../../components/places/PlaceMap';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadingIndicator } from '../../components/LoadingIndicator';
 import { ScreenLayout } from '../../components/ScreenLayout';
+import { useSnackbar } from '../../contexts/SnackbarContext';
+import { paperCardStyle } from '../../constants/ui';
 import { useTrips } from '../../hooks/useTrips';
 import { getNextPlace, type NextPlaceResult } from '../../services/nextPlace';
-import { openPlaceInNavigator, openPlaceOnMap } from '../../services/maps';
-import { paperCardStyle } from '../../constants/ui';
 import { formatCoordinate, hasValidCoordinates } from '../../utils/coordinates';
+import { getDbErrorMessage } from '../../utils/errors';
 import { toISODateString } from '../../utils/dates';
 
 export default function NextPlaceScreen() {
   const db = useSQLiteContext();
   const { editTripPlace } = useTrips();
+  const { showError, showMessage } = useSnackbar();
   const [result, setResult] = useState<NextPlaceResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isMarking, setIsMarking] = useState(false);
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
 
   const loadNextPlace = useCallback(async () => {
     setIsLoading(true);
@@ -50,41 +52,13 @@ export default function NextPlaceScreen() {
         visited: true,
         visitDate: toISODateString(new Date()),
       });
-      setSnackbarVisible(true);
+      showMessage('Место отмечено как посещённое');
       await loadNextPlace();
-    } catch {
-      Alert.alert('Ошибка', 'Не удалось отметить место как посещённое');
+    } catch (error) {
+      showError(getDbErrorMessage(error));
     } finally {
       setIsMarking(false);
     }
-  };
-
-  const handleOpenOnMap = async () => {
-    if (result?.status !== 'has_next' || !result.place) {
-      return;
-    }
-
-    const { latitude, longitude } = result.place.dd;
-    if (!hasValidCoordinates(latitude, longitude)) {
-      Alert.alert('Карта', 'У этого места не указаны координаты');
-      return;
-    }
-
-    await openPlaceOnMap(latitude!, longitude!, result.place.name);
-  };
-
-  const handleOpenInNavigator = async () => {
-    if (result?.status !== 'has_next' || !result.place) {
-      return;
-    }
-
-    const { latitude, longitude } = result.place.dd;
-    if (!hasValidCoordinates(latitude, longitude)) {
-      Alert.alert('Навигатор', 'У этого места не указаны координаты');
-      return;
-    }
-
-    await openPlaceInNavigator(latitude!, longitude!);
   };
 
   return (
@@ -140,16 +114,7 @@ export default function NextPlaceScreen() {
               <PlaceMap dd={result.place.dd} title={result.place.name} height={220} />
 
               <View style={styles.actions}>
-                <Button mode="outlined" icon="map-marker" onPress={() => void handleOpenOnMap()}>
-                  Открыть на карте
-                </Button>
-                <Button
-                  mode="outlined"
-                  icon="navigation"
-                  onPress={() => void handleOpenInNavigator()}
-                >
-                  Открыть в навигаторе
-                </Button>
+                <MapActionButtons dd={result.place.dd} label={result.place.name} />
                 <Button
                   mode="contained"
                   icon="check-circle"
@@ -173,10 +138,6 @@ export default function NextPlaceScreen() {
           </Button>
         </View>
       ) : null}
-
-      <Snackbar visible={snackbarVisible} onDismiss={() => setSnackbarVisible(false)} duration={3000}>
-        Место отмечено как посещённое
-      </Snackbar>
     </ScreenLayout>
   );
 }

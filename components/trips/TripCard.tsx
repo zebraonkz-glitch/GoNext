@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { Card, Chip, ProgressBar, Text } from 'react-native-paper';
 
-import { paperCardStyle } from '../../constants/ui';
+import { paperCardStyle, UI } from '../../constants/ui';
 
 import type { Trip, TripStats } from '../../types';
 import { formatDateRange } from '../../utils/dates';
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   },
   currentCard: {
     borderWidth: 2,
-    borderColor: '#6200ee',
+    borderColor: UI.primary,
   },
   content: {
     gap: 8,

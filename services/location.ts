@@ -10,15 +10,23 @@ export async function requestLocationPermission(): Promise<boolean> {
 export async function getCurrentCoordinates(): Promise<DecimalDegrees> {
   const granted = await requestLocationPermission();
   if (!granted) {
-    throw new Error('Нет разрешения на использование геолокации');
+    throw new Error(
+      'Нет разрешения на геолокацию. Разрешите доступ в настройках или введите координаты вручную.'
+    );
   }
 
-  const position = await Location.getCurrentPositionAsync({
-    accuracy: Location.Accuracy.Balanced,
-  });
+  try {
+    const position = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Balanced,
+    });
 
-  return {
-    latitude: position.coords.latitude,
-    longitude: position.coords.longitude,
-  };
+    return {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+    };
+  } catch {
+    throw new Error(
+      'Не удалось определить местоположение. Проверьте GPS или введите координаты вручную.'
+    );
+  }
 }

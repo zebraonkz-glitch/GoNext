@@ -4,6 +4,7 @@ import { Button } from 'react-native-paper';
 
 import { PickContactDialog } from './PickContactDialog';
 import { FormPanel, PaperTextInput } from '../PaperTextInput';
+import { UI } from '../../constants/ui';
 import {
   mapDeviceContactToCompanionInput,
   pickDeviceContactNative,
@@ -109,7 +110,7 @@ export function CompanionForm({
       </Button>
 
       {onDelete ? (
-        <Button mode="outlined" textColor="#b00020" onPress={onDelete} style={styles.button}>
+        <Button mode="outlined" textColor={UI.error} onPress={onDelete} style={styles.button}>
           Удалить
         </Button>
       ) : null}

@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Text } from 'react-native-paper';
 import { WebView } from 'react-native-webview';
 
+import { CoordinatesFallback } from './MapActionButtons';
 import { UI } from '../../constants/ui';
 import type { DecimalDegrees } from '../../types';
 import { hasValidCoordinates } from '../../utils/coordinates';
@@ -25,34 +25,11 @@ export function PlaceMap({ dd, title, height = 200 }: PlaceMapProps) {
   );
 
   if (!hasValidCoordinates(dd.latitude, dd.longitude)) {
-    return (
-      <View style={[styles.placeholder, { height }]}>
-        <Text variant="bodyMedium" style={styles.placeholderText}>
-          Координаты не указаны
-        </Text>
-      </View>
-    );
+    return <CoordinatesFallback dd={dd} title={title} height={height} />;
   }
 
   if (hasError) {
-    return (
-      <View style={[styles.placeholder, { height }]}>
-        <Text variant="bodyMedium" style={styles.placeholderText}>
-          Не удалось загрузить карту
-        </Text>
-        <Text variant="bodySmall" style={styles.coords}>
-          {latitude.toFixed(5)}, {longitude.toFixed(5)}
-        </Text>
-        {title ? (
-          <Text variant="bodySmall" style={styles.coords}>
-            {title}
-          </Text>
-        ) : null}
-        <Text variant="bodySmall" style={styles.hint}>
-          Проверьте подключение к интернету
-        </Text>
-      </View>
-    );
+    return <CoordinatesFallback dd={dd} title={title} height={height} offline />;
   }
 
   return (
@@ -73,33 +50,12 @@ export function PlaceMap({ dd, title, height = 200 }: PlaceMapProps) {
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 8,
+    borderRadius: UI.radius,
     overflow: 'hidden',
     backgroundColor: UI.surfaceMuted,
   },
   webview: {
     flex: 1,
     backgroundColor: UI.surfaceMuted,
-  },
-  placeholder: {
-    borderRadius: 8,
-    backgroundColor: UI.surfaceMuted,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 12,
-    gap: 4,
-  },
-  placeholderText: {
-    opacity: 0.6,
-    textAlign: 'center',
-  },
-  coords: {
-    opacity: 0.6,
-    textAlign: 'center',
-  },
-  hint: {
-    opacity: 0.5,
-    textAlign: 'center',
-    marginTop: 4,
   },
 });
