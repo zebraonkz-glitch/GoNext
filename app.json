@@ -42,7 +42,8 @@
           "photosPermission": "GoNext использует галерею для прикрепления фотографий к местам.",
           "cameraPermission": "GoNext использует камеру для съёмки фотографий мест."
         }
-      ]
+      ],
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true

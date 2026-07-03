@@ -12,7 +12,7 @@ interface ScreenLayoutProps {
 export function ScreenLayout({ title, children, showBack = true }: ScreenLayoutProps) {
   return (
     <View style={styles.container}>
-      <Appbar.Header>
+      <Appbar.Header style={styles.header}>
         {showBack ? <Appbar.BackAction onPress={() => router.back()} /> : null}
         <Appbar.Content title={title} />
       </Appbar.Header>
@@ -27,5 +27,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    backgroundColor: 'transparent',
+  },
+  header: {
+    backgroundColor: 'rgba(255, 255, 255, 0.88)',
   },
 });

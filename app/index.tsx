@@ -14,7 +14,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Appbar.Header>
+      <Appbar.Header style={styles.header}>
         <Appbar.Content title="GoNext" />
       </Appbar.Header>
 
@@ -39,6 +39,10 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'transparent',
+  },
+  header: {
+    backgroundColor: 'rgba(255, 255, 255, 0.88)',
   },
   menu: {
     flex: 1,

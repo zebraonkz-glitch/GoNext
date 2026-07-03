@@ -91,6 +91,45 @@ export async function updateTripPlace(
   return getTripPlaceById(db, id);
 }
 
+export async function getTripPlaceStatsByTripIds(
+  db: SQLiteDatabase,
+  tripIds: string[]
+): Promise<Record<string, { total: number; visited: number }>> {
+  if (tripIds.length === 0) {
+    return {};
+  }
+
+  const placeholders = tripIds.map(() => '?').join(', ');
+  const rows = await db.getAllAsync<{ tripId: string; total: number; visited: number }>(
+    `SELECT tripId, COUNT(*) as total, SUM(visited) as visited
+     FROM trip_places
+     WHERE tripId IN (${placeholders})
+     GROUP BY tripId`,
+    ...tripIds
+  );
+
+  return Object.fromEntries(
+    rows.map((row) => [row.tripId, { total: row.total, visited: row.visited }])
+  );
+}
+
+export async function reorderTripPlaces(
+  db: SQLiteDatabase,
+  tripId: string,
+  orderedIds: string[]
+): Promise<void> {
+  await db.withTransactionAsync(async () => {
+    for (let index = 0; index < orderedIds.length; index += 1) {
+      await db.runAsync(
+        'UPDATE trip_places SET orderIndex = ? WHERE id = ? AND tripId = ?',
+        index,
+        orderedIds[index],
+        tripId
+      );
+    }
+  });
+}
+
 export async function deleteTripPlace(db: SQLiteDatabase, id: string): Promise<boolean> {
   const result = await db.runAsync('DELETE FROM trip_places WHERE id = ?', id);
   return (result.changes ?? 0) > 0;

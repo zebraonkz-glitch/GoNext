@@ -43,6 +43,10 @@ interface DataContextValue {
   editTripPlace: (id: string, input: UpdateTripPlaceInput) => Promise<TripPlace | null>;
   removeTripPlace: (id: string) => Promise<boolean>;
   getNextTripPlace: (tripId: string) => Promise<TripPlace | null>;
+  reorderTripPlaces: (tripId: string, orderedIds: string[]) => Promise<void>;
+  getTripPlacePhotos: (tripPlaceId: string) => Promise<Photo[]>;
+  addTripPlacePhoto: (tripPlaceId: string, sourceUri: string) => Promise<Photo>;
+  removeTripPlacePhoto: (photoId: string) => Promise<boolean>;
 }
 
 const DataContext = createContext<DataContextValue | null>(null);
@@ -147,6 +151,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const removeTrip = useCallback(
     async (id: string) => {
+      const tripPlaces = await tripPlaceRepo.getTripPlacesByTripId(db, id);
+      for (const tripPlace of tripPlaces) {
+        const photos = await photoRepo.deletePhotosByEntity(db, 'trip_place', tripPlace.id);
+        for (const photo of photos) {
+          await deletePhotoFile(photo);
+        }
+      }
+
       const removed = await tripRepo.deleteTrip(db, id);
       if (removed) {
         await refreshTrips();
@@ -175,12 +187,42 @@ export function DataProvider({ children }: { children: ReactNode }) {
   );
 
   const removeTripPlace = useCallback(
-    async (id: string) => tripPlaceRepo.deleteTripPlace(db, id),
+    async (id: string) => {
+      const photos = await photoRepo.deletePhotosByEntity(db, 'trip_place', id);
+      for (const photo of photos) {
+        await deletePhotoFile(photo);
+      }
+
+      return tripPlaceRepo.deleteTripPlace(db, id);
+    },
     [db]
   );
 
   const getNextTripPlace = useCallback(
     (tripId: string) => tripPlaceRepo.getNextTripPlace(db, tripId),
+    [db]
+  );
+
+  const reorderTripPlaces = useCallback(
+    async (tripId: string, orderedIds: string[]) => {
+      await tripPlaceRepo.reorderTripPlaces(db, tripId, orderedIds);
+    },
+    [db]
+  );
+
+  const getTripPlacePhotos = useCallback(
+    (tripPlaceId: string) => photoRepo.getPhotosByEntity(db, 'trip_place', tripPlaceId),
+    [db]
+  );
+
+  const addTripPlacePhoto = useCallback(
+    async (tripPlaceId: string, sourceUri: string) =>
+      savePhotoFromUri(db, sourceUri, 'trip_place', tripPlaceId),
+    [db]
+  );
+
+  const removeTripPlacePhoto = useCallback(
+    async (photoId: string) => deletePhoto(db, photoId),
     [db]
   );
 
@@ -209,6 +251,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       editTripPlace,
       removeTripPlace,
       getNextTripPlace,
+      reorderTripPlaces,
+      getTripPlacePhotos,
+      addTripPlacePhoto,
+      removeTripPlacePhoto,
     }),
     [
       places,
@@ -234,6 +280,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
       editTripPlace,
       removeTripPlace,
       getNextTripPlace,
+      reorderTripPlaces,
+      getTripPlacePhotos,
+      addTripPlacePhoto,
+      removeTripPlacePhoto,
     ]
   );
 

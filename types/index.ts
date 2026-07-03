@@ -51,3 +51,12 @@ export type UpdateTripInput = Partial<CreateTripInput>;
 
 export type CreateTripPlaceInput = Omit<TripPlace, 'id'>;
 export type UpdateTripPlaceInput = Partial<Omit<TripPlace, 'id' | 'tripId' | 'placeId'>>;
+
+export interface TripPlaceWithPlace extends TripPlace {
+  place: Place;
+}
+
+export interface TripStats {
+  total: number;
+  visited: number;
+}

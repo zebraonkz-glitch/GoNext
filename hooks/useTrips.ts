@@ -2,6 +2,7 @@ import { useData } from '../contexts/DataProvider';
 import type {
   CreateTripInput,
   CreateTripPlaceInput,
+  Photo,
   Trip,
   TripPlace,
   UpdateTripInput,
@@ -11,8 +12,10 @@ import type {
 export function useTrips() {
   const {
     trips,
+    places,
     isLoading,
     refreshTrips,
+    refreshPlaces,
     addTrip,
     editTrip,
     removeTrip,
@@ -23,12 +26,19 @@ export function useTrips() {
     editTripPlace,
     removeTripPlace,
     getNextTripPlace,
+    reorderTripPlaces,
+    getTripPlacePhotos,
+    addTripPlacePhoto,
+    removeTripPlacePhoto,
+    getPlace,
   } = useData();
 
   return {
     trips,
+    places,
     isLoading,
     refreshTrips,
+    refreshPlaces,
     addTrip,
     editTrip,
     removeTrip,
@@ -39,12 +49,18 @@ export function useTrips() {
     editTripPlace,
     removeTripPlace,
     getNextTripPlace,
+    reorderTripPlaces,
+    getTripPlacePhotos,
+    addTripPlacePhoto,
+    removeTripPlacePhoto,
+    getPlace,
   };
 }
 
 export type {
   CreateTripInput,
   CreateTripPlaceInput,
+  Photo,
   Trip,
   TripPlace,
   UpdateTripInput,
