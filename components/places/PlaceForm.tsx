@@ -7,10 +7,11 @@ import { FormPanel, PaperTextInput } from '../PaperTextInput';
 
 import { PhotoGallery } from './PhotoGallery';
 import { PlaceMap } from './PlaceMap';
+import { PlaceCompanionsSection } from '../companions/PlaceCompanionsSection';
 import { UI } from '../../constants/ui';
 import { getCurrentCoordinates } from '../../services/location';
 import { openPlaceOnMap } from '../../services/maps';
-import type { CreatePlaceInput, Photo } from '../../types';
+import type { Companion, CreatePlaceInput, Photo } from '../../types';
 import {
   formatCoordinate,
   hasValidCoordinates,
@@ -25,6 +26,9 @@ interface PlaceFormProps {
   onDelete?: () => void;
   onAddPhoto?: (uri: string) => Promise<void>;
   onRemovePhoto?: (photoId: string) => Promise<void>;
+  companions?: Companion[];
+  onLinkCompanion?: () => void;
+  onUnlinkCompanion?: (companionId: string) => void;
   submitLabel?: string;
 }
 
@@ -36,6 +40,9 @@ export function PlaceForm({
   onDelete,
   onAddPhoto,
   onRemovePhoto,
+  companions,
+  onLinkCompanion,
+  onUnlinkCompanion,
   submitLabel = 'Сохранить',
 }: PlaceFormProps) {
   const [name, setName] = useState(initialValues.name);
@@ -251,6 +258,14 @@ export function PlaceForm({
             </ScrollView>
           )}
         </View>
+      ) : null}
+
+      {placeId && companions && onLinkCompanion && onUnlinkCompanion ? (
+        <PlaceCompanionsSection
+          companions={companions}
+          onLink={onLinkCompanion}
+          onUnlink={onUnlinkCompanion}
+        />
       ) : null}
 
       <Button mode="contained" onPress={() => void handleSubmit()} loading={isSaving} style={styles.button}>

@@ -1,4 +1,4 @@
-import type { Photo, PhotoEntityType, Place, Trip, TripPlace } from '../types';
+import type { Companion, Photo, PhotoEntityType, Place, Trip, TripPlace } from '../types';
 
 type PlaceRow = {
   id: string;
@@ -36,6 +36,15 @@ type PhotoRow = {
   entityType: string;
   entityId: string;
   filePath: string;
+  createdAt: string;
+};
+
+type CompanionRow = {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  notes: string;
   createdAt: string;
 };
 
@@ -84,6 +93,17 @@ export function mapPhotoRow(row: PhotoRow): Photo {
     entityType: row.entityType as PhotoEntityType,
     entityId: row.entityId,
     filePath: row.filePath,
+    createdAt: row.createdAt,
+  };
+}
+
+export function mapCompanionRow(row: CompanionRow): Companion {
+  return {
+    id: row.id,
+    name: row.name,
+    phone: row.phone,
+    email: row.email,
+    notes: row.notes,
     createdAt: row.createdAt,
   };
 }

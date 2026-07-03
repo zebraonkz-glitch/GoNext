@@ -53,3 +53,24 @@ export const CREATE_PHOTOS_TABLE = `
     createdAt TEXT NOT NULL
   );
 `;
+
+export const CREATE_COMPANIONS_TABLE = `
+  CREATE TABLE IF NOT EXISTS companions (
+    id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    phone TEXT NOT NULL DEFAULT '',
+    email TEXT NOT NULL DEFAULT '',
+    notes TEXT NOT NULL DEFAULT '',
+    createdAt TEXT NOT NULL
+  );
+`;
+
+export const CREATE_PLACE_COMPANIONS_TABLE = `
+  CREATE TABLE IF NOT EXISTS place_companions (
+    placeId TEXT NOT NULL,
+    companionId TEXT NOT NULL,
+    PRIMARY KEY (placeId, companionId),
+    FOREIGN KEY (placeId) REFERENCES places(id) ON DELETE CASCADE,
+    FOREIGN KEY (companionId) REFERENCES companions(id) ON DELETE CASCADE
+  );
+`;

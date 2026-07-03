@@ -43,6 +43,15 @@ export interface Photo {
   createdAt: string;
 }
 
+export interface Companion {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  notes: string;
+  createdAt: string;
+}
+
 export type CreatePlaceInput = Omit<Place, 'id' | 'createdAt'>;
 export type UpdatePlaceInput = Partial<CreatePlaceInput>;
 
@@ -51,6 +60,9 @@ export type UpdateTripInput = Partial<CreateTripInput>;
 
 export type CreateTripPlaceInput = Omit<TripPlace, 'id'>;
 export type UpdateTripPlaceInput = Partial<Omit<TripPlace, 'id' | 'tripId' | 'placeId'>>;
+
+export type CreateCompanionInput = Omit<Companion, 'id' | 'createdAt'>;
+export type UpdateCompanionInput = Partial<CreateCompanionInput>;
 
 export interface TripPlaceWithPlace extends TripPlace {
   place: Place;

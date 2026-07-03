@@ -2,22 +2,33 @@ import { type Href, router, useFocusEffect, useLocalSearchParams } from 'expo-ro
 import { useCallback, useState } from 'react';
 import { Alert } from 'react-native';
 
+import { LinkCompanionDialog } from '../../components/companions/LinkCompanionDialog';
 import { PlaceForm } from '../../components/places/PlaceForm';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { LoadingIndicator } from '../../components/LoadingIndicator';
 import { ScreenLayout } from '../../components/ScreenLayout';
+import { useCompanions } from '../../hooks/useCompanions';
 import { usePlaces } from '../../hooks/usePlaces';
-import type { CreatePlaceInput, Photo, Place } from '../../types';
+import type { Companion, CreatePlaceInput, Photo, Place } from '../../types';
 
 export default function PlaceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getPlace, editPlace, removePlace, getPlacePhotos, addPlacePhoto, removePlacePhoto } =
     usePlaces();
+  const {
+    companions: allCompanions,
+    refreshCompanions,
+    getPlaceCompanions,
+    linkCompanionToPlace,
+    unlinkCompanionFromPlace,
+  } = useCompanions();
 
   const [place, setPlace] = useState<Place | null>(null);
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [placeCompanions, setPlaceCompanions] = useState<Companion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [deleteVisible, setDeleteVisible] = useState(false);
+  const [linkDialogVisible, setLinkDialogVisible] = useState(false);
 
   const loadPlace = useCallback(async () => {
     if (!id) {
@@ -32,18 +43,23 @@ export default function PlaceDetailScreen() {
         ]);
         return;
       }
-      const loadedPhotos = await getPlacePhotos(id);
+      const [loadedPhotos, loadedCompanions] = await Promise.all([
+        getPlacePhotos(id),
+        getPlaceCompanions(id),
+      ]);
       setPlace(loadedPlace);
       setPhotos(loadedPhotos);
+      setPlaceCompanions(loadedCompanions);
     } finally {
       setIsLoading(false);
     }
-  }, [getPlace, getPlacePhotos, id]);
+  }, [getPlace, getPlaceCompanions, getPlacePhotos, id]);
 
   useFocusEffect(
     useCallback(() => {
+      void refreshCompanions();
       void loadPlace();
-    }, [loadPlace])
+    }, [loadPlace, refreshCompanions])
   );
 
   const handleSubmit = async (values: CreatePlaceInput) => {
@@ -68,6 +84,24 @@ export default function PlaceDetailScreen() {
   const handleRemovePhoto = async (photoId: string) => {
     await removePlacePhoto(photoId);
     setPhotos((current) => current.filter((photo) => photo.id !== photoId));
+  };
+
+  const handleLinkCompanion = async (companionId: string) => {
+    if (!id) {
+      return;
+    }
+    await linkCompanionToPlace(id, companionId);
+    const loadedCompanions = await getPlaceCompanions(id);
+    setPlaceCompanions(loadedCompanions);
+    setLinkDialogVisible(false);
+  };
+
+  const handleUnlinkCompanion = async (companionId: string) => {
+    if (!id) {
+      return;
+    }
+    await unlinkCompanionFromPlace(id, companionId);
+    setPlaceCompanions((current) => current.filter((companion) => companion.id !== companionId));
   };
 
   const handleDelete = async () => {
@@ -99,10 +133,21 @@ export default function PlaceDetailScreen() {
         }}
         placeId={id}
         photos={photos}
+        companions={placeCompanions}
+        onLinkCompanion={() => setLinkDialogVisible(true)}
+        onUnlinkCompanion={(companionId) => void handleUnlinkCompanion(companionId)}
         onSubmit={handleSubmit}
         onDelete={() => setDeleteVisible(true)}
         onAddPhoto={handleAddPhoto}
         onRemovePhoto={handleRemovePhoto}
+      />
+
+      <LinkCompanionDialog
+        visible={linkDialogVisible}
+        companions={allCompanions}
+        linkedCompanionIds={placeCompanions.map((companion) => companion.id)}
+        onDismiss={() => setLinkDialogVisible(false)}
+        onSelect={(companionId) => void handleLinkCompanion(companionId)}
       />
 
       <ConfirmDialog

@@ -1,12 +1,17 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useSQLiteContext } from 'expo-sqlite';
 
+import * as companionRepo from '../db/companions';
 import * as photoRepo from '../db/photos';
+import * as placeCompanionRepo from '../db/placeCompanions';
 import * as placeRepo from '../db/places';
 import * as tripPlaceRepo from '../db/tripPlaces';
 import * as tripRepo from '../db/trips';
+import { clearAllData as resetDatabase } from '../db/reset';
 import { deletePhoto, deletePhotoFile, savePhotoFromUri } from '../services/photos';
 import type {
+  Companion,
+  CreateCompanionInput,
   CreatePlaceInput,
   CreateTripInput,
   CreateTripPlaceInput,
@@ -14,6 +19,7 @@ import type {
   Place,
   Trip,
   TripPlace,
+  UpdateCompanionInput,
   UpdatePlaceInput,
   UpdateTripInput,
   UpdateTripPlaceInput,
@@ -22,9 +28,11 @@ import type {
 interface DataContextValue {
   places: Place[];
   trips: Trip[];
+  companions: Companion[];
   isLoading: boolean;
   refreshPlaces: () => Promise<void>;
   refreshTrips: () => Promise<void>;
+  refreshCompanions: () => Promise<void>;
   refreshAll: () => Promise<void>;
   addPlace: (input: CreatePlaceInput) => Promise<Place>;
   editPlace: (id: string, input: UpdatePlaceInput) => Promise<Place | null>;
@@ -47,6 +55,14 @@ interface DataContextValue {
   getTripPlacePhotos: (tripPlaceId: string) => Promise<Photo[]>;
   addTripPlacePhoto: (tripPlaceId: string, sourceUri: string) => Promise<Photo>;
   removeTripPlacePhoto: (photoId: string) => Promise<boolean>;
+  addCompanion: (input: CreateCompanionInput) => Promise<Companion>;
+  editCompanion: (id: string, input: UpdateCompanionInput) => Promise<Companion | null>;
+  removeCompanion: (id: string) => Promise<boolean>;
+  getCompanion: (id: string) => Promise<Companion | null>;
+  getPlaceCompanions: (placeId: string) => Promise<Companion[]>;
+  linkCompanionToPlace: (placeId: string, companionId: string) => Promise<boolean>;
+  unlinkCompanionFromPlace: (placeId: string, companionId: string) => Promise<boolean>;
+  clearAllData: () => Promise<void>;
 }
 
 const DataContext = createContext<DataContextValue | null>(null);
@@ -55,6 +71,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const db = useSQLiteContext();
   const [places, setPlaces] = useState<Place[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
+  const [companions, setCompanions] = useState<Companion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshPlaces = useCallback(async () => {
@@ -67,14 +84,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setTrips(data);
   }, [db]);
 
+  const refreshCompanions = useCallback(async () => {
+    const data = await companionRepo.getAllCompanions(db);
+    setCompanions(data);
+  }, [db]);
+
   const refreshAll = useCallback(async () => {
     setIsLoading(true);
     try {
-      await Promise.all([refreshPlaces(), refreshTrips()]);
+      await Promise.all([refreshPlaces(), refreshTrips(), refreshCompanions()]);
     } finally {
       setIsLoading(false);
     }
-  }, [refreshPlaces, refreshTrips]);
+  }, [refreshPlaces, refreshTrips, refreshCompanions]);
 
   useEffect(() => {
     void refreshAll();
@@ -226,13 +248,71 @@ export function DataProvider({ children }: { children: ReactNode }) {
     [db]
   );
 
+  const addCompanion = useCallback(
+    async (input: CreateCompanionInput) => {
+      const companion = await companionRepo.createCompanion(db, input);
+      await refreshCompanions();
+      return companion;
+    },
+    [db, refreshCompanions]
+  );
+
+  const editCompanion = useCallback(
+    async (id: string, input: UpdateCompanionInput) => {
+      const companion = await companionRepo.updateCompanion(db, id, input);
+      await refreshCompanions();
+      return companion;
+    },
+    [db, refreshCompanions]
+  );
+
+  const removeCompanion = useCallback(
+    async (id: string) => {
+      const removed = await companionRepo.deleteCompanion(db, id);
+      if (removed) {
+        await refreshCompanions();
+      }
+      return removed;
+    },
+    [db, refreshCompanions]
+  );
+
+  const getCompanion = useCallback(
+    (id: string) => companionRepo.getCompanionById(db, id),
+    [db]
+  );
+
+  const getPlaceCompanions = useCallback(
+    (placeId: string) => placeCompanionRepo.getCompanionsForPlace(db, placeId),
+    [db]
+  );
+
+  const linkCompanionToPlace = useCallback(
+    async (placeId: string, companionId: string) =>
+      placeCompanionRepo.linkCompanionToPlace(db, placeId, companionId),
+    [db]
+  );
+
+  const unlinkCompanionFromPlace = useCallback(
+    async (placeId: string, companionId: string) =>
+      placeCompanionRepo.unlinkCompanionFromPlace(db, placeId, companionId),
+    [db]
+  );
+
+  const clearAllData = useCallback(async () => {
+    await resetDatabase(db);
+    await refreshAll();
+  }, [db, refreshAll]);
+
   const value = useMemo<DataContextValue>(
     () => ({
       places,
       trips,
+      companions,
       isLoading,
       refreshPlaces,
       refreshTrips,
+      refreshCompanions,
       refreshAll,
       addPlace,
       editPlace,
@@ -255,13 +335,23 @@ export function DataProvider({ children }: { children: ReactNode }) {
       getTripPlacePhotos,
       addTripPlacePhoto,
       removeTripPlacePhoto,
+      addCompanion,
+      editCompanion,
+      removeCompanion,
+      getCompanion,
+      getPlaceCompanions,
+      linkCompanionToPlace,
+      unlinkCompanionFromPlace,
+      clearAllData,
     }),
     [
       places,
       trips,
+      companions,
       isLoading,
       refreshPlaces,
       refreshTrips,
+      refreshCompanions,
       refreshAll,
       addPlace,
       editPlace,
@@ -284,6 +374,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
       getTripPlacePhotos,
       addTripPlacePhoto,
       removeTripPlacePhoto,
+      addCompanion,
+      editCompanion,
+      removeCompanion,
+      getCompanion,
+      getPlaceCompanions,
+      linkCompanionToPlace,
+      unlinkCompanionFromPlace,
+      clearAllData,
     ]
   );
 
