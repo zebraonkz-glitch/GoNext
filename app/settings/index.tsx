@@ -120,7 +120,9 @@ export default function SettingsScreen() {
                           ? 'crosshairs-gps'
                           : permission === 'camera'
                             ? 'camera'
-                            : 'image'
+                            : permission === 'contacts'
+                              ? 'contacts'
+                              : 'image'
                       }
                     />
                   )}

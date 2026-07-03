@@ -9,10 +9,11 @@ import { SnackbarProvider } from '../contexts/SnackbarContext';
 import { DATABASE_NAME } from '../constants';
 import { initDatabase } from '../db/database';
 import { appTheme } from '../theme/paper';
+import { paperSettings } from '../theme/paperSettings';
 
 export default function RootLayout() {
   return (
-    <PaperProvider theme={appTheme}>
+    <PaperProvider theme={appTheme} settings={paperSettings}>
       <SQLiteProvider databaseName={DATABASE_NAME} onInit={initDatabase}>
         <SnackbarProvider>
           <DataProvider>

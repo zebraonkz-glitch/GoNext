@@ -20,19 +20,44 @@ export default function HomeScreen() {
       </Appbar.Header>
 
       <View style={styles.menu}>
-        <Button mode="contained" onPress={() => router.push('/places' as Href)} style={styles.button}>
+        <Button
+          mode="contained"
+          icon="map-marker"
+          onPress={() => router.push('/places' as Href)}
+          style={styles.button}
+        >
           Места
         </Button>
-        <Button mode="contained" onPress={() => router.push('/trips' as Href)} style={styles.button}>
+        <Button
+          mode="contained"
+          icon="bag-suitcase"
+          onPress={() => router.push('/trips' as Href)}
+          style={styles.button}
+        >
           Поездки
         </Button>
-        <Button mode="contained" onPress={() => router.push('/companions' as Href)} style={styles.button}>
+        <Button
+          mode="contained"
+          icon="account-group"
+          onPress={() => router.push('/companions' as Href)}
+          style={styles.button}
+        >
           Попутчики
         </Button>
-        <Button mode="contained" onPress={() => router.push('/next' as Href)} style={styles.button}>
+        <Button
+          mode="contained"
+          icon="sign-direction"
+          onPress={() => router.push('/next' as Href)}
+          style={styles.button}
+        >
           Следующее место
         </Button>
-        <Button mode="contained" onPress={() => router.push('/settings' as Href)} style={styles.button}>
+        <Button
+          mode="contained"
+          icon="cog"
+          onPress={() => router.push('/settings' as Href)}
+          style={styles.button}
+        >
           Настройки
         </Button>
       </View>
