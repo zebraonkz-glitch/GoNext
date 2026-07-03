@@ -1,8 +1,15 @@
 import { type Href, router } from 'expo-router';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { useState } from 'react';
+import { FlatList, Platform, StyleSheet, View } from 'react-native';
 import { Button, Dialog, Portal, Text } from 'react-native-paper';
 
-import type { Companion } from '../../types';
+import { PickContactDialog } from './PickContactDialog';
+import {
+  mapDeviceContactToCompanionInput,
+  pickDeviceContactNative,
+  type DeviceContactPreview,
+} from '../../services/deviceContacts';
+import type { Companion, CreateCompanionInput } from '../../types';
 
 interface LinkCompanionDialogProps {
   visible: boolean;
@@ -10,6 +17,7 @@ interface LinkCompanionDialogProps {
   linkedCompanionIds: string[];
   onDismiss: () => void;
   onSelect: (companionId: string) => void;
+  onImportContact: (input: CreateCompanionInput) => Promise<void>;
 }
 
 export function LinkCompanionDialog({
@@ -18,12 +26,43 @@ export function LinkCompanionDialog({
   linkedCompanionIds,
   onDismiss,
   onSelect,
+  onImportContact,
 }: LinkCompanionDialogProps) {
+  const [contactPickerVisible, setContactPickerVisible] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+
   const availableCompanions = companions.filter(
     (companion) => !linkedCompanionIds.includes(companion.id)
   );
 
+  const handleImportContact = async (contact: DeviceContactPreview) => {
+    setIsImporting(true);
+    try {
+      await onImportContact(mapDeviceContactToCompanionInput(contact));
+      setContactPickerVisible(false);
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handlePickFromContacts = async () => {
+    if (Platform.OS === 'ios') {
+      setIsImporting(true);
+      try {
+        const contact = await pickDeviceContactNative();
+        if (contact) {
+          await handleImportContact(contact);
+        }
+      } finally {
+        setIsImporting(false);
+      }
+      return;
+    }
+    setContactPickerVisible(true);
+  };
+
   return (
+    <>
     <Portal>
       <Dialog visible={visible} onDismiss={onDismiss} style={styles.dialog}>
         <Dialog.Title>Привязать попутчика</Dialog.Title>
@@ -45,6 +84,14 @@ export function LinkCompanionDialog({
           <View style={styles.footer}>
             <Button
               mode="outlined"
+              icon="contacts"
+              loading={isImporting}
+              onPress={() => void handlePickFromContacts()}
+            >
+              Выбрать из контактов
+            </Button>
+            <Button
+              mode="outlined"
               icon="plus"
               onPress={() => {
                 onDismiss();
@@ -60,6 +107,13 @@ export function LinkCompanionDialog({
         </Dialog.Actions>
       </Dialog>
     </Portal>
+
+    <PickContactDialog
+      visible={contactPickerVisible}
+      onDismiss={() => setContactPickerVisible(false)}
+      onSelect={(contact) => void handleImportContact(contact)}
+    />
+    </>
   );
 }
 
@@ -75,5 +129,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginTop: 12,
+    gap: 8,
   },
 });

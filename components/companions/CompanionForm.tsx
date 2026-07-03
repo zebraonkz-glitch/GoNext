@@ -1,8 +1,14 @@
 import { useState } from 'react';
-import { Alert, StyleSheet } from 'react-native';
+import { Alert, Platform, StyleSheet } from 'react-native';
 import { Button } from 'react-native-paper';
 
+import { PickContactDialog } from './PickContactDialog';
 import { FormPanel, PaperTextInput } from '../PaperTextInput';
+import {
+  mapDeviceContactToCompanionInput,
+  pickDeviceContactNative,
+  type DeviceContactPreview,
+} from '../../services/deviceContacts';
 import type { CreateCompanionInput } from '../../types';
 
 interface CompanionFormProps {
@@ -23,6 +29,26 @@ export function CompanionForm({
   const [email, setEmail] = useState(initialValues.email);
   const [notes, setNotes] = useState(initialValues.notes);
   const [isSaving, setIsSaving] = useState(false);
+  const [contactPickerVisible, setContactPickerVisible] = useState(false);
+
+  const applyContact = (contact: DeviceContactPreview) => {
+    const input = mapDeviceContactToCompanionInput(contact);
+    setName(input.name);
+    setPhone(input.phone);
+    setEmail(input.email);
+    setContactPickerVisible(false);
+  };
+
+  const handlePickFromContacts = async () => {
+    if (Platform.OS === 'ios') {
+      const contact = await pickDeviceContactNative();
+      if (contact) {
+        applyContact(contact);
+      }
+      return;
+    }
+    setContactPickerVisible(true);
+  };
 
   const handleSubmit = async () => {
     const trimmedName = name.trim();
@@ -45,7 +71,17 @@ export function CompanionForm({
   };
 
   return (
+    <>
     <FormPanel>
+      <Button
+        mode="outlined"
+        icon="contacts"
+        onPress={() => void handlePickFromContacts()}
+        style={styles.button}
+      >
+        Выбрать из контактов
+      </Button>
+
       <PaperTextInput label="Имя *" value={name} onChangeText={setName} />
       <PaperTextInput
         label="Телефон"
@@ -78,6 +114,13 @@ export function CompanionForm({
         </Button>
       ) : null}
     </FormPanel>
+
+    <PickContactDialog
+      visible={contactPickerVisible}
+      onDismiss={() => setContactPickerVisible(false)}
+      onSelect={applyContact}
+    />
+    </>
   );
 }
 

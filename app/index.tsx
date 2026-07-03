@@ -26,6 +26,9 @@ export default function HomeScreen() {
         <Button mode="contained" onPress={() => router.push('/trips' as Href)} style={styles.button}>
           Поездки
         </Button>
+        <Button mode="contained" onPress={() => router.push('/companions' as Href)} style={styles.button}>
+          Попутчики
+        </Button>
         <Button mode="contained" onPress={() => router.push('/next' as Href)} style={styles.button}>
           Следующее место
         </Button>

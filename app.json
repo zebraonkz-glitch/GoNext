@@ -43,6 +43,12 @@
           "cameraPermission": "GoNext использует камеру для съёмки фотографий мест."
         }
       ],
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "GoNext использует контакты для добавления попутчиков."
+        }
+      ],
       "@react-native-community/datetimepicker"
     ],
     "experiments": {

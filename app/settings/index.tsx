@@ -20,7 +20,7 @@ import {
   type PermissionState,
 } from '../../services/permissions';
 
-const PERMISSIONS: AppPermission[] = ['location', 'camera', 'mediaLibrary'];
+const PERMISSIONS: AppPermission[] = ['location', 'camera', 'mediaLibrary', 'contacts'];
 
 export default function SettingsScreen() {
   const { clearAllData } = useData();
@@ -28,6 +28,7 @@ export default function SettingsScreen() {
     location: 'undetermined',
     camera: 'undetermined',
     mediaLibrary: 'undetermined',
+    contacts: 'undetermined',
   });
   const [clearDialogVisible, setClearDialogVisible] = useState(false);
   const [isClearing, setIsClearing] = useState(false);

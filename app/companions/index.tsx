@@ -4,15 +4,18 @@ import { FlatList, RefreshControl, StyleSheet } from 'react-native';
 import { FAB, Searchbar } from 'react-native-paper';
 
 import { CompanionCard } from '../../components/companions/CompanionCard';
+import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadingIndicator } from '../../components/LoadingIndicator';
 import { ScreenLayout } from '../../components/ScreenLayout';
 import { paperSearchbarStyle } from '../../constants/ui';
 import { useCompanions } from '../../hooks/useCompanions';
+import type { Companion } from '../../types';
 
 export default function CompanionsListScreen() {
-  const { companions, isLoading, refreshCompanions } = useCompanions();
+  const { companions, isLoading, refreshCompanions, removeCompanion } = useCompanions();
   const [searchQuery, setSearchQuery] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<Companion | null>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   useFocusEffect(
@@ -40,6 +43,14 @@ export default function CompanionsListScreen() {
     } finally {
       setRefreshing(false);
     }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) {
+      return;
+    }
+    await removeCompanion(deleteTarget.id);
+    setDeleteTarget(null);
   };
 
   if (isLoading && companions.length === 0) {
@@ -78,6 +89,7 @@ export default function CompanionsListScreen() {
             <CompanionCard
               companion={item}
               onPress={() => router.push(`/companions/${item.id}` as Href)}
+              onDelete={() => setDeleteTarget(item)}
               showActions
             />
           )}
@@ -90,6 +102,17 @@ export default function CompanionsListScreen() {
         onPress={() => router.push('/companions/new' as Href)}
       />
 
+      <ConfirmDialog
+        visible={deleteTarget !== null}
+        title="Удалить попутчика?"
+        message={
+          deleteTarget
+            ? `Контакт «${deleteTarget.name}» будет удалён из всех мест.`
+            : ''
+        }
+        onConfirm={() => void handleDelete()}
+        onDismiss={() => setDeleteTarget(null)}
+      />
     </ScreenLayout>
   );
 }

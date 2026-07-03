@@ -8,6 +8,7 @@ import type { Companion } from '../../types';
 interface CompanionCardProps {
   companion: Companion;
   onPress?: () => void;
+  onDelete?: () => void;
   onUnlink?: () => void;
   showActions?: boolean;
 }
@@ -15,6 +16,7 @@ interface CompanionCardProps {
 export function CompanionCard({
   companion,
   onPress,
+  onDelete,
   onUnlink,
   showActions = true,
 }: CompanionCardProps) {
@@ -67,6 +69,9 @@ export function CompanionCard({
             ) : null}
             {onUnlink ? (
               <IconButton icon="link-off" size={20} onPress={onUnlink} />
+            ) : null}
+            {onDelete ? (
+              <IconButton icon="delete-outline" size={20} onPress={onDelete} />
             ) : null}
           </View>
         ) : null}

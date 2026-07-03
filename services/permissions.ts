@@ -1,8 +1,9 @@
+import { getPermissionsAsync, requestPermissionsAsync } from 'expo-contacts';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { Linking } from 'react-native';
 
-export type AppPermission = 'location' | 'camera' | 'mediaLibrary';
+export type AppPermission = 'location' | 'camera' | 'mediaLibrary' | 'contacts';
 
 export type PermissionState = 'granted' | 'denied' | 'undetermined';
 
@@ -10,6 +11,7 @@ const PERMISSION_LABELS: Record<AppPermission, string> = {
   location: 'Геолокация',
   camera: 'Камера',
   mediaLibrary: 'Галерея',
+  contacts: 'Контакты',
 };
 
 export function getPermissionLabel(permission: AppPermission): string {
@@ -40,6 +42,10 @@ export async function getPermissionState(permission: AppPermission): Promise<Per
       const result = await ImagePicker.getMediaLibraryPermissionsAsync();
       return mapStatus(result.status);
     }
+    case 'contacts': {
+      const result = await getPermissionsAsync();
+      return mapStatus(result.status);
+    }
   }
 }
 
@@ -55,6 +61,10 @@ export async function requestPermission(permission: AppPermission): Promise<Perm
     }
     case 'mediaLibrary': {
       const result = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      return mapStatus(result.status);
+    }
+    case 'contacts': {
+      const result = await requestPermissionsAsync();
       return mapStatus(result.status);
     }
   }
@@ -84,6 +94,8 @@ export function getPermissionHint(permission: AppPermission, state: PermissionSt
         return 'Нужна для съёмки фотографий.';
       case 'mediaLibrary':
         return 'Нужна для выбора фото из галереи.';
+      case 'contacts':
+        return 'Нужна для выбора попутчиков из телефонной книги.';
     }
   }
 
@@ -94,6 +106,8 @@ export function getPermissionHint(permission: AppPermission, state: PermissionSt
       return 'Доступ запрещён. Разрешите камеру в настройках устройства.';
     case 'mediaLibrary':
       return 'Доступ запрещён. Разрешите галерею в настройках устройства.';
+    case 'contacts':
+      return 'Доступ запрещён. Разрешите контакты в настройках устройства.';
   }
 }
 

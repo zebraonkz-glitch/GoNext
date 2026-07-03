@@ -9,7 +9,7 @@ import { LoadingIndicator } from '../../components/LoadingIndicator';
 import { ScreenLayout } from '../../components/ScreenLayout';
 import { useCompanions } from '../../hooks/useCompanions';
 import { usePlaces } from '../../hooks/usePlaces';
-import type { Companion, CreatePlaceInput, Photo, Place } from '../../types';
+import type { Companion, CreateCompanionInput, CreatePlaceInput, Photo, Place } from '../../types';
 
 export default function PlaceDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -18,6 +18,7 @@ export default function PlaceDetailScreen() {
   const {
     companions: allCompanions,
     refreshCompanions,
+    addCompanion,
     getPlaceCompanions,
     linkCompanionToPlace,
     unlinkCompanionFromPlace,
@@ -96,6 +97,11 @@ export default function PlaceDetailScreen() {
     setLinkDialogVisible(false);
   };
 
+  const handleImportContact = async (input: CreateCompanionInput) => {
+    const companion = await addCompanion(input);
+    await handleLinkCompanion(companion.id);
+  };
+
   const handleUnlinkCompanion = async (companionId: string) => {
     if (!id) {
       return;
@@ -148,6 +154,7 @@ export default function PlaceDetailScreen() {
         linkedCompanionIds={placeCompanions.map((companion) => companion.id)}
         onDismiss={() => setLinkDialogVisible(false)}
         onSelect={(companionId) => void handleLinkCompanion(companionId)}
+        onImportContact={handleImportContact}
       />
 
       <ConfirmDialog
