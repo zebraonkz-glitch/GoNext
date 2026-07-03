@@ -356,13 +356,13 @@ app/
 
 ---
 
-## Этап 9. Тестирование и сборка
+## Этап 9. Тестирование и сборка ✅
 
 **Цель:** проверить приложение на реальных устройствах и подготовить сборку.
 
 ### 9.1. Ручное тестирование
 
-Чек-лист:
+Чек-лист (см. также [README.md](./README.md)):
 
 - [ ] Создание / редактирование / удаление места
 - [ ] Привязка фото к месту
@@ -378,17 +378,25 @@ app/
 ### 9.2. Сборка
 
 ```powershell
+# Проверка
+npm run typecheck
+npm run doctor
+
 # Android
-npx expo run:android
+npm run prebuild:android
+npm run run:android
 
 # iOS (на macOS)
-npx expo run:ios
+npm run prebuild:ios
+npm run run:ios
 ```
 
 ### 9.3. Финальная проверка
 
-- `npx tsc --noEmit` — без ошибок типов
-- Проверка на Android и iOS (или эмуляторах)
+- `npm run typecheck` — без ошибок типов ✅
+- `npm run doctor` — 20/20 проверок ✅
+- `npx expo export --platform android` — бандл собирается ✅
+- Проверка на Android и iOS (или эмуляторах) — вручную по чек-листу
 
 **Результат этапа:** готовый MVP для использования.
 

@@ -1,8 +1,13 @@
 # Expo
 .expo/
+.expo-export-test/
 dist/
 web-build/
 expo-env.d.ts
+
+# Native (prebuild)
+android/
+ios/
 
 # Logs
 logs
