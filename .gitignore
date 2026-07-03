@@ -1,3 +1,9 @@
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
 # Logs
 logs
 *.log
