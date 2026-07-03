@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
-import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { Button, Modal, Portal, Text } from 'react-native-paper';
 
 import { UI, paperInputStyle } from '../../constants/ui';
-
 import { formatDate, parseISODate, toISODateString } from '../../utils/dates';
 
 interface DatePickerFieldProps {
@@ -22,22 +21,27 @@ export function DatePickerField({ label, value, onChange }: DatePickerFieldProps
     setVisible(true);
   };
 
-  const handleChange = (_event: DateTimePickerEvent, date?: Date) => {
-    if (Platform.OS === 'android') {
-      setVisible(false);
-      if (date) {
-        onChange(toISODateString(date));
-      }
+  const closePicker = () => {
+    setVisible(false);
+  };
+
+  const handleValueChange = (_event: unknown, date?: Date) => {
+    if (!date) {
       return;
     }
-    if (date) {
-      setTempDate(date);
+
+    if (Platform.OS === 'android') {
+      onChange(toISODateString(date));
+      closePicker();
+      return;
     }
+
+    setTempDate(date);
   };
 
   const confirmIOS = () => {
     onChange(toISODateString(tempDate));
-    setVisible(false);
+    closePicker();
   };
 
   return (
@@ -55,18 +59,29 @@ export function DatePickerField({ label, value, onChange }: DatePickerFieldProps
       </View>
 
       {Platform.OS === 'android' && visible ? (
-        <DateTimePicker value={tempDate} mode="date" display="default" onChange={handleChange} />
+        <DateTimePicker
+          value={tempDate}
+          mode="date"
+          display="default"
+          onValueChange={handleValueChange}
+          onDismiss={closePicker}
+        />
       ) : null}
 
       {Platform.OS === 'ios' ? (
         <Portal>
-          <Modal visible={visible} onDismiss={() => setVisible(false)} contentContainerStyle={styles.modal}>
+          <Modal visible={visible} onDismiss={closePicker} contentContainerStyle={styles.modal}>
             <Text variant="titleMedium" style={styles.modalTitle}>
               {label}
             </Text>
-            <DateTimePicker value={tempDate} mode="date" display="spinner" onChange={handleChange} />
+            <DateTimePicker
+              value={tempDate}
+              mode="date"
+              display="spinner"
+              onValueChange={handleValueChange}
+            />
             <View style={styles.modalActions}>
-              <Button onPress={() => setVisible(false)}>Отмена</Button>
+              <Button onPress={closePicker}>Отмена</Button>
               <Button mode="contained" onPress={confirmIOS}>
                 Готово
               </Button>
