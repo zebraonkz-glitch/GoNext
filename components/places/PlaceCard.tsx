@@ -1,4 +1,5 @@
 import { Image, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Card, Chip, IconButton, Text } from 'react-native-paper';
 
 import { paperCardStyle } from '../../constants/ui';
@@ -13,6 +14,8 @@ interface PlaceCardProps {
 }
 
 export function PlaceCard({ place, thumbnail, onPress, onDelete }: PlaceCardProps) {
+  const { t } = useTranslation();
+
   return (
     <Card style={[styles.card, paperCardStyle]} onPress={onPress}>
       <View style={styles.row}>
@@ -35,12 +38,12 @@ export function PlaceCard({ place, thumbnail, onPress, onDelete }: PlaceCardProp
           <View style={styles.chips}>
             {place.visitlater ? (
               <Chip compact icon="clock-outline" style={styles.chip}>
-                Позже
+                {t('placeCard.later')}
               </Chip>
             ) : null}
             {place.liked ? (
               <Chip compact icon="heart" style={styles.chip}>
-                Нравится
+                {t('placeCard.liked')}
               </Chip>
             ) : null}
           </View>

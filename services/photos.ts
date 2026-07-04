@@ -3,13 +3,14 @@ import type { SQLiteDatabase } from 'expo-sqlite';
 
 import { PHOTOS_DIRECTORY } from '../constants';
 import { createPhotoRecord, deletePhotoRecord } from '../db/photos';
+import i18n from '../i18n';
 import type { Photo, PhotoEntityType } from '../types';
 import { generateId } from '../utils/id';
 
 function getPhotosDirectoryUri(): string {
   const base = FileSystem.documentDirectory;
   if (!base) {
-    throw new Error('Каталог документов недоступен');
+    throw new Error(i18n.t('photos.documentsUnavailable'));
   }
   return `${base}${PHOTOS_DIRECTORY}/`;
 }

@@ -1,5 +1,7 @@
+import i18n from '../i18n';
+
 export function buildMapHtml(latitude: number, longitude: number, title?: string): string {
-  const safeTitle = title ? title.replace(/'/g, "\\'") : 'Место';
+  const safeTitle = title ? title.replace(/'/g, "\\'") : i18n.t('common.place');
 
   return `<!DOCTYPE html>
 <html>

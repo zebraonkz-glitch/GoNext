@@ -2,6 +2,7 @@ import { type Href, router, useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { FAB, Searchbar } from 'react-native-paper';
 
 import { useAppTheme } from '../../contexts/ThemeProvider';
@@ -16,6 +17,7 @@ import { usePlaces } from '../../hooks/usePlaces';
 import type { Photo, Place } from '../../types';
 
 export default function PlacesListScreen() {
+  const { t } = useTranslation();
   const db = useSQLiteContext();
   const { colors } = useAppTheme();
   const { places, isLoading, refreshPlaces, removePlace } = usePlaces();
@@ -73,13 +75,13 @@ export default function PlacesListScreen() {
 
   return (
     <View style={styles.container}>
-      <ScreenLayout title="Места">
+      <ScreenLayout title={t('places.title')}>
         {isLoading && places.length === 0 ? (
           <LoadingIndicator />
         ) : (
           <>
             <Searchbar
-              placeholder="Поиск по названию"
+              placeholder={t('places.searchPlaceholder')}
               value={searchQuery}
               onChangeText={setSearchQuery}
               style={[styles.searchbar, getPaperSearchbarStyle(colors)]}
@@ -87,11 +89,11 @@ export default function PlacesListScreen() {
             />
             {filteredPlaces.length === 0 ? (
               <EmptyState
-                title={places.length === 0 ? 'Список мест пуст' : 'Ничего не найдено'}
+                title={places.length === 0 ? t('places.emptyTitle') : t('common.notFound')}
                 message={
                   places.length === 0
-                    ? 'Нажмите «+», чтобы добавить первое место.'
-                    : 'Попробуйте изменить запрос поиска.'
+                    ? t('places.emptyMessage')
+                    : t('places.emptySearchMessage')
                 }
               />
             ) : (
@@ -118,13 +120,15 @@ export default function PlacesListScreen() {
         icon="plus"
         style={styles.fab}
         onPress={() => router.push('/places/new' as Href)}
-        label="Добавить"
+        label={t('common.add')}
       />
 
       <ConfirmDialog
         visible={deleteTarget !== null}
-        title="Удалить место?"
-        message={deleteTarget ? `Место «${deleteTarget.name}» будет удалено вместе с фотографиями.` : undefined}
+        title={t('places.deleteTitle')}
+        message={
+          deleteTarget ? t('places.deleteMessage', { name: deleteTarget.name }) : undefined
+        }
         onConfirm={() => void handleDelete()}
         onDismiss={() => setDeleteTarget(null)}
       />

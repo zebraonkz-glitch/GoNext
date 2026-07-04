@@ -1,4 +1,5 @@
 import { StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Card, Chip, ProgressBar, Text } from 'react-native-paper';
 
 import { useAppTheme } from '../../contexts/ThemeProvider';
@@ -14,6 +15,7 @@ interface TripCardProps {
 }
 
 export function TripCard({ trip, stats, onPress }: TripCardProps) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const progress = stats.total > 0 ? stats.visited / stats.total : 0;
 
@@ -33,7 +35,7 @@ export function TripCard({ trip, stats, onPress }: TripCardProps) {
           </Text>
           {trip.current ? (
             <Chip compact icon="star" style={styles.currentChip}>
-              Текущая
+              {t('trips.currentChip')}
             </Chip>
           ) : null}
         </View>
@@ -46,7 +48,7 @@ export function TripCard({ trip, stats, onPress }: TripCardProps) {
           </Text>
         ) : null}
         <Text variant="bodySmall" style={styles.stats}>
-          Мест: {stats.total} · Посещено: {stats.visited} / {stats.total}
+          {t('trips.stats', { total: stats.total, visited: stats.visited })}
         </Text>
         <ProgressBar progress={progress} style={styles.progress} />
       </Card.Content>

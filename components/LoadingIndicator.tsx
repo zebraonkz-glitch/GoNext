@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Text } from 'react-native-paper';
 
@@ -5,12 +6,14 @@ interface LoadingIndicatorProps {
   message?: string;
 }
 
-export function LoadingIndicator({ message = 'Загрузка...' }: LoadingIndicatorProps) {
+export function LoadingIndicator({ message }: LoadingIndicatorProps) {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.container}>
       <ActivityIndicator animating size="large" />
       <Text variant="bodyMedium" style={styles.message}>
-        {message}
+        {message ?? t('common.loading')}
       </Text>
     </View>
   );

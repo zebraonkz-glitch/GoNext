@@ -1,5 +1,6 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
+import i18n from '../i18n';
 import type { CreateTripPlaceInput, TripPlace, UpdateTripPlaceInput } from '../types';
 import { generateId } from '../utils/id';
 import { mapTripPlaceRow } from './mappers';
@@ -60,7 +61,7 @@ export async function createTripPlace(
 
   const tripPlace = await getTripPlaceById(db, id);
   if (!tripPlace) {
-    throw new Error('Не удалось добавить место в поездку');
+    throw new Error(i18n.t('trips.addPlaceFailed'));
   }
   return tripPlace;
 }

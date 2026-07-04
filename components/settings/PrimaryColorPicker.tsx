@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { THEME_PRIMARY_OPTIONS, type ThemePrimaryId } from '../../constants/themeColors';
@@ -9,6 +10,7 @@ interface PrimaryColorPickerProps {
 }
 
 export function PrimaryColorPicker({ value, onChange }: PrimaryColorPickerProps) {
+  const { t } = useTranslation();
   const { mode, colors } = useAppTheme();
 
   return (
@@ -22,7 +24,7 @@ export function PrimaryColorPicker({ value, onChange }: PrimaryColorPickerProps)
             key={option.id}
             accessibilityRole="radio"
             accessibilityState={{ selected }}
-            accessibilityLabel={option.label}
+            accessibilityLabel={t(`theme.colors.${option.id}`)}
             onPress={() => onChange(option.id)}
             style={[
               styles.swatchOuter,

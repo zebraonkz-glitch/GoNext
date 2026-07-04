@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useTranslation } from 'react-i18next';
 import { Button, Modal, Portal, Text } from 'react-native-paper';
 
 import { useAppTheme } from '../../contexts/ThemeProvider';
@@ -14,6 +15,7 @@ interface DatePickerFieldProps {
 }
 
 export function DatePickerField({ label, value, onChange }: DatePickerFieldProps) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const [visible, setVisible] = useState(false);
   const [tempDate, setTempDate] = useState<Date>(parseISODate(value) ?? new Date());
@@ -55,7 +57,7 @@ export function DatePickerField({ label, value, onChange }: DatePickerFieldProps
         </Button>
         {value ? (
           <Button mode="text" onPress={() => onChange(null)}>
-            Очистить
+            {t('common.clear')}
           </Button>
         ) : null}
       </View>
@@ -87,9 +89,9 @@ export function DatePickerField({ label, value, onChange }: DatePickerFieldProps
               onValueChange={handleValueChange}
             />
             <View style={styles.modalActions}>
-              <Button onPress={closePicker}>Отмена</Button>
+              <Button onPress={closePicker}>{t('common.cancel')}</Button>
               <Button mode="contained" onPress={confirmIOS}>
-                Готово
+                {t('common.done')}
               </Button>
             </View>
           </Modal>

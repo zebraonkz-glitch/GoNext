@@ -1,6 +1,7 @@
 import { type Href, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { LinkCompanionDialog } from '../../components/companions/LinkCompanionDialog';
 import { PlaceForm } from '../../components/places/PlaceForm';
@@ -12,6 +13,7 @@ import { usePlaces } from '../../hooks/usePlaces';
 import type { Companion, CreateCompanionInput, CreatePlaceInput, Photo, Place } from '../../types';
 
 export default function PlaceDetailScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getPlace, editPlace, removePlace, getPlacePhotos, addPlacePhoto, removePlacePhoto } =
     usePlaces();
@@ -39,8 +41,8 @@ export default function PlaceDetailScreen() {
     try {
       const loadedPlace = await getPlace(id);
       if (!loadedPlace) {
-        Alert.alert('Ошибка', 'Место не найдено', [
-          { text: 'OK', onPress: () => router.back() },
+        Alert.alert(t('common.error'), t('places.notFound'), [
+          { text: t('common.ok'), onPress: () => router.back() },
         ]);
         return;
       }
@@ -70,7 +72,7 @@ export default function PlaceDetailScreen() {
     const updated = await editPlace(id, values);
     if (updated) {
       setPlace(updated);
-      Alert.alert('Готово', 'Изменения сохранены');
+      Alert.alert(t('common.done'), t('places.savedChanges'));
     }
   };
 
@@ -121,7 +123,7 @@ export default function PlaceDetailScreen() {
 
   if (isLoading || !place) {
     return (
-      <ScreenLayout title="Место">
+      <ScreenLayout title={t('places.editTitle')}>
         <LoadingIndicator />
       </ScreenLayout>
     );
@@ -159,8 +161,8 @@ export default function PlaceDetailScreen() {
 
       <ConfirmDialog
         visible={deleteVisible}
-        title="Удалить место?"
-        message={`Место «${place.name}» будет удалено вместе с фотографиями.`}
+        title={t('places.deleteTitle')}
+        message={t('places.deleteMessage', { name: place.name })}
         onConfirm={() => void handleDelete()}
         onDismiss={() => setDeleteVisible(false)}
       />

@@ -1,6 +1,7 @@
 import { type Href, router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { FAB, Searchbar } from 'react-native-paper';
 
 import { CompanionCard } from '../../components/companions/CompanionCard';
@@ -14,6 +15,7 @@ import { useCompanions } from '../../hooks/useCompanions';
 import type { Companion } from '../../types';
 
 export default function CompanionsListScreen() {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const { companions, isLoading, refreshCompanions, removeCompanion } = useCompanions();
   const [searchQuery, setSearchQuery] = useState('');
@@ -57,16 +59,16 @@ export default function CompanionsListScreen() {
 
   if (isLoading && companions.length === 0) {
     return (
-      <ScreenLayout title="Попутчики">
+      <ScreenLayout title={t('companions.title')}>
         <LoadingIndicator />
       </ScreenLayout>
     );
   }
 
   return (
-    <ScreenLayout title="Попутчики">
+    <ScreenLayout title={t('companions.title')}>
       <Searchbar
-        placeholder="Поиск по имени, телефону, email"
+        placeholder={t('companions.searchPlaceholder')}
         value={searchQuery}
         onChangeText={setSearchQuery}
         style={getPaperSearchbarStyle(colors)}
@@ -74,11 +76,11 @@ export default function CompanionsListScreen() {
 
       {filteredCompanions.length === 0 ? (
         <EmptyState
-          title={searchQuery ? 'Ничего не найдено' : 'Нет попутчиков'}
+          title={searchQuery ? t('common.notFound') : t('companions.emptyTitle')}
           message={
             searchQuery
-              ? 'Попробуйте другой запрос'
-              : 'Добавьте контакты попутчиков для быстрого звонка и сообщений'
+              ? t('companions.emptySearchMessage')
+              : t('companions.emptyMessage')
           }
         />
       ) : (
@@ -106,10 +108,10 @@ export default function CompanionsListScreen() {
 
       <ConfirmDialog
         visible={deleteTarget !== null}
-        title="Удалить попутчика?"
+        title={t('companions.deleteTitle')}
         message={
           deleteTarget
-            ? `Контакт «${deleteTarget.name}» будет удалён из всех мест.`
+            ? t('companions.deleteMessage', { name: deleteTarget.name })
             : ''
         }
         onConfirm={() => void handleDelete()}

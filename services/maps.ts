@@ -1,11 +1,13 @@
 import { Linking, Platform } from 'react-native';
 
+import i18n from '../i18n';
+
 export async function openPlaceOnMap(
   latitude: number,
   longitude: number,
   label?: string
 ): Promise<void> {
-  const encodedLabel = encodeURIComponent(label ?? 'Место');
+  const encodedLabel = encodeURIComponent(label ?? i18n.t('common.place'));
   const url =
     Platform.OS === 'ios'
       ? `maps:0,0?q=${encodedLabel}@${latitude},${longitude}`

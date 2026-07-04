@@ -2,6 +2,7 @@ import { type Href, router, useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Button, Card, Text } from 'react-native-paper';
 
 import { MapActionButtons } from '../../components/places/MapActionButtons';
@@ -18,6 +19,7 @@ import { getDbErrorMessage } from '../../utils/errors';
 import { toISODateString } from '../../utils/dates';
 
 export default function NextPlaceScreen() {
+  const { t } = useTranslation();
   const db = useSQLiteContext();
   const { editTripPlace } = useTrips();
   const { showError, showMessage } = useSnackbar();
@@ -52,7 +54,7 @@ export default function NextPlaceScreen() {
         visited: true,
         visitDate: toISODateString(new Date()),
       });
-      showMessage('Место отмечено как посещённое');
+      showMessage(t('nextPlace.markedVisited'));
       await loadNextPlace();
     } catch (error) {
       showError(getDbErrorMessage(error));
@@ -62,22 +64,22 @@ export default function NextPlaceScreen() {
   };
 
   return (
-    <ScreenLayout title="Следующее место">
+    <ScreenLayout title={t('nextPlace.title')}>
       {isLoading ? (
-        <LoadingIndicator message="Поиск следующего места..." />
+        <LoadingIndicator message={t('nextPlace.loading')} />
       ) : result?.status === 'no_current_trip' ? (
         <EmptyState
-          title="Нет текущей поездки"
-          message="Отметьте поездку как текущую, чтобы увидеть следующее место маршрута."
+          title={t('nextPlace.noCurrentTripTitle')}
+          message={t('nextPlace.noCurrentTripMessage')}
         />
       ) : result?.status === 'route_completed' ? (
         <View style={styles.stateContainer}>
           <EmptyState
-            title="Маршрут завершён"
+            title={t('nextPlace.routeCompletedTitle')}
             message={
               result.trip
-                ? `Все места поездки «${result.trip.title}» посещены.`
-                : 'Все места текущей поездки посещены.'
+                ? t('nextPlace.routeCompletedWithTrip', { title: result.trip.title })
+                : t('nextPlace.routeCompletedDefault')
             }
           />
           {result.trip ? (
@@ -86,14 +88,14 @@ export default function NextPlaceScreen() {
               onPress={() => router.push(`/trips/${result.trip!.id}` as Href)}
               style={styles.stateButton}
             >
-              Открыть поездку
+              {t('nextPlace.openTrip')}
             </Button>
           ) : null}
         </View>
       ) : result?.status === 'has_next' && result.place && result.trip ? (
         <ScrollView contentContainerStyle={styles.content}>
           <Text variant="labelLarge" style={styles.tripLabel}>
-            Поездка: {result.trip.title}
+            {t('nextPlace.tripLabel', { title: result.trip.title })}
           </Text>
 
           <Card style={[styles.card, paperCardStyle]}>
@@ -105,10 +107,10 @@ export default function NextPlaceScreen() {
                 </Text>
               ) : null}
               <Text variant="bodySmall" style={styles.coords}>
-                Координаты:{' '}
+                {t('nextPlace.coordinatesLabel')}{' '}
                 {hasValidCoordinates(result.place.dd.latitude, result.place.dd.longitude)
                   ? `${formatCoordinate(result.place.dd.latitude)}, ${formatCoordinate(result.place.dd.longitude)}`
-                  : 'не указаны'}
+                  : t('common.coordinatesNotSet')}
               </Text>
 
               <PlaceMap dd={result.place.dd} title={result.place.name} height={220} />
@@ -121,20 +123,20 @@ export default function NextPlaceScreen() {
                   loading={isMarking}
                   onPress={() => void handleMarkVisited()}
                 >
-                  Отметить посещённым
+                  {t('nextPlace.markVisited')}
                 </Button>
               </View>
             </Card.Content>
           </Card>
         </ScrollView>
       ) : (
-        <EmptyState title="Нет данных" message="Не удалось загрузить следующее место." />
+        <EmptyState title={t('common.noData')} message={t('nextPlace.loadFailed')} />
       )}
 
       {result?.status === 'no_current_trip' ? (
         <View style={styles.footer}>
           <Button mode="contained" onPress={() => router.push('/trips' as Href)}>
-            Выбрать поездку
+            {t('nextPlace.selectTrip')}
           </Button>
         </View>
       ) : null}

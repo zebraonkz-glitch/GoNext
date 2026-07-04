@@ -1,6 +1,7 @@
 import { type Href, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Alert, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { CompanionForm } from '../../components/companions/CompanionForm';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
@@ -10,6 +11,7 @@ import { useCompanions } from '../../hooks/useCompanions';
 import type { Companion, CreateCompanionInput } from '../../types';
 
 export default function CompanionDetailScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { getCompanion, editCompanion, removeCompanion } = useCompanions();
 
@@ -25,8 +27,8 @@ export default function CompanionDetailScreen() {
     try {
       const loaded = await getCompanion(id);
       if (!loaded) {
-        Alert.alert('Ошибка', 'Попутчик не найден', [
-          { text: 'OK', onPress: () => router.back() },
+        Alert.alert(t('common.error'), t('companions.notFound'), [
+          { text: t('common.ok'), onPress: () => router.back() },
         ]);
         return;
       }
@@ -49,7 +51,7 @@ export default function CompanionDetailScreen() {
     const updated = await editCompanion(id, values);
     if (updated) {
       setCompanion(updated);
-      Alert.alert('Готово', 'Изменения сохранены');
+      Alert.alert(t('common.done'), t('companions.savedChanges'));
     }
   };
 
@@ -64,7 +66,7 @@ export default function CompanionDetailScreen() {
 
   if (isLoading || !companion) {
     return (
-      <ScreenLayout title="Попутчик">
+      <ScreenLayout title={t('companions.editTitle')}>
         <LoadingIndicator />
       </ScreenLayout>
     );
@@ -87,8 +89,8 @@ export default function CompanionDetailScreen() {
 
       <ConfirmDialog
         visible={deleteVisible}
-        title="Удалить попутчика?"
-        message={`Контакт «${companion.name}» будет удалён из всех мест.`}
+        title={t('companions.deleteTitle')}
+        message={t('companions.deleteMessage', { name: companion.name })}
         onConfirm={() => void handleDelete()}
         onDismiss={() => setDeleteVisible(false)}
       />

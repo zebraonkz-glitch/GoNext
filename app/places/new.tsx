@@ -1,5 +1,6 @@
 import { type Href, router, useLocalSearchParams } from 'expo-router';
 import { Alert, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { PlaceForm } from '../../components/places/PlaceForm';
 import { ScreenLayout } from '../../components/ScreenLayout';
@@ -18,6 +19,7 @@ const defaultValues: CreatePlaceInput = {
 };
 
 export default function NewPlaceScreen() {
+  const { t } = useTranslation();
   const db = useSQLiteContext();
   const { tripId } = useLocalSearchParams<{ tripId?: string }>();
   const { addPlace } = usePlaces();
@@ -42,25 +44,25 @@ export default function NewPlaceScreen() {
         visitDate: null,
         notes: '',
       });
-      Alert.alert('Готово', 'Место создано и добавлено в поездку', [
-        { text: 'OK', onPress: () => router.replace(`/trips/${tripId}` as Href) },
+      Alert.alert(t('common.done'), t('places.createdWithTrip'), [
+        { text: t('common.ok'), onPress: () => router.replace(`/trips/${tripId}` as Href) },
       ]);
       return;
     }
 
-    Alert.alert('Готово', 'Место сохранено', [
-      { text: 'К списку', onPress: () => router.replace('/places' as Href) },
+    Alert.alert(t('common.done'), t('places.saved'), [
+      { text: t('common.toList'), onPress: () => router.replace('/places' as Href) },
       {
-        text: 'Открыть',
+        text: t('common.open'),
         onPress: () => router.replace(`/places/${place.id}` as Href),
       },
     ]);
   };
 
   return (
-    <ScreenLayout title="Новое место">
+    <ScreenLayout title={t('places.newTitle')}>
       <ScrollView keyboardShouldPersistTaps="handled">
-        <PlaceForm initialValues={defaultValues} onSubmit={handleSubmit} submitLabel="Создать" />
+        <PlaceForm initialValues={defaultValues} onSubmit={handleSubmit} submitLabel={t('common.create')} />
       </ScrollView>
     </ScreenLayout>
   );

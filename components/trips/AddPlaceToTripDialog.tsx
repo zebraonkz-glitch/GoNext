@@ -1,5 +1,6 @@
 import { type Href, router } from 'expo-router';
 import { FlatList, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Button, Dialog, Portal, Text } from 'react-native-paper';
 
 import type { Place } from '../../types';
@@ -21,15 +22,16 @@ export function AddPlaceToTripDialog({
   onDismiss,
   onSelect,
 }: AddPlaceToTripDialogProps) {
+  const { t } = useTranslation();
   const availablePlaces = places.filter((place) => !excludedPlaceIds.includes(place.id));
 
   return (
     <Portal>
       <Dialog visible={visible} onDismiss={onDismiss} style={styles.dialog}>
-        <Dialog.Title>Добавить место</Dialog.Title>
+        <Dialog.Title>{t('addPlaceToTrip.title')}</Dialog.Title>
         <Dialog.Content>
           {availablePlaces.length === 0 ? (
-            <Text variant="bodyMedium">Нет доступных мест. Создайте новое.</Text>
+            <Text variant="bodyMedium">{t('addPlaceToTrip.noPlaces')}</Text>
           ) : (
             <FlatList
               data={availablePlaces}
@@ -51,12 +53,12 @@ export function AddPlaceToTripDialog({
                 router.push(`/places/new?tripId=${tripId}` as Href);
               }}
             >
-              Создать новое место
+              {t('addPlaceToTrip.createNew')}
             </Button>
           </View>
         </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={onDismiss}>Закрыть</Button>
+          <Button onPress={onDismiss}>{t('common.close')}</Button>
         </Dialog.Actions>
       </Dialog>
     </Portal>

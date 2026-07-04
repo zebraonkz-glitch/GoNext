@@ -1,6 +1,7 @@
 import { type Href, router } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, Platform, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Button, Dialog, Portal, Text } from 'react-native-paper';
 
 import { PickContactDialog } from './PickContactDialog';
@@ -28,6 +29,7 @@ export function LinkCompanionDialog({
   onSelect,
   onImportContact,
 }: LinkCompanionDialogProps) {
+  const { t } = useTranslation();
   const [contactPickerVisible, setContactPickerVisible] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
 
@@ -65,10 +67,10 @@ export function LinkCompanionDialog({
     <>
     <Portal>
       <Dialog visible={visible} onDismiss={onDismiss} style={styles.dialog}>
-        <Dialog.Title>Привязать попутчика</Dialog.Title>
+        <Dialog.Title>{t('linkCompanion.title')}</Dialog.Title>
         <Dialog.Content>
           {availableCompanions.length === 0 ? (
-            <Text variant="bodyMedium">Нет доступных попутчиков. Создайте нового.</Text>
+            <Text variant="bodyMedium">{t('linkCompanion.noCompanions')}</Text>
           ) : (
             <FlatList
               data={availableCompanions}
@@ -88,7 +90,7 @@ export function LinkCompanionDialog({
               loading={isImporting}
               onPress={() => void handlePickFromContacts()}
             >
-              Выбрать из контактов
+              {t('linkCompanion.pickFromContacts')}
             </Button>
             <Button
               mode="outlined"
@@ -98,12 +100,12 @@ export function LinkCompanionDialog({
                 router.push('/companions/new' as Href);
               }}
             >
-              Создать попутчика
+              {t('linkCompanion.createCompanion')}
             </Button>
           </View>
         </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={onDismiss}>Закрыть</Button>
+          <Button onPress={onDismiss}>{t('common.close')}</Button>
         </Dialog.Actions>
       </Dialog>
     </Portal>

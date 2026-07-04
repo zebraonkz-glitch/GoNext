@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Card, IconButton, Switch, Text } from 'react-native-paper';
 
 import { PaperTextInput } from '../PaperTextInput';
@@ -40,6 +41,7 @@ export function TripPlaceCard({
   onAddPhoto,
   onRemovePhoto,
 }: TripPlaceCardProps) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const [notes, setNotes] = useState(item.notes);
 
@@ -64,7 +66,7 @@ export function TripPlaceCard({
             <Text variant="titleMedium">{item.place.name}</Text>
             {item.visited && item.visitDate ? (
               <Text variant="bodySmall" style={styles.visitDate}>
-                Посещено: {formatDate(item.visitDate)}
+                {t('tripPlace.visitedOn', { date: formatDate(item.visitDate) })}
               </Text>
             ) : null}
           </View>
@@ -84,13 +86,13 @@ export function TripPlaceCard({
 
         {!diaryMode ? (
           <View style={styles.switchRow}>
-            <Text variant="bodyMedium">Посещено</Text>
+            <Text variant="bodyMedium">{t('tripPlace.visited')}</Text>
             <Switch value={item.visited} onValueChange={onToggleVisited} />
           </View>
         ) : null}
 
         <PaperTextInput
-          label="Заметки"
+          label={t('tripPlace.notes')}
           value={notes}
           onChangeText={setNotes}
           onBlur={() => {

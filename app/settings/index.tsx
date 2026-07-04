@@ -2,6 +2,7 @@ import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import Constants from 'expo-constants';
+import { useTranslation } from 'react-i18next';
 import { Button, Divider, List, SegmentedButtons, Text } from 'react-native-paper';
 
 import { ConfirmDialog } from '../../components/ConfirmDialog';
@@ -11,6 +12,7 @@ import { ScreenLayout } from '../../components/ScreenLayout';
 import { useAppTheme } from '../../contexts/ThemeProvider';
 import { type ThemeMode, type ThemePrimaryId } from '../../constants/ui';
 import { useData } from '../../contexts/DataProvider';
+import { changeLanguage, type AppLanguage } from '../../i18n';
 import {
   type AppPermission,
   getPermissionHint,
@@ -25,6 +27,7 @@ import {
 const PERMISSIONS: AppPermission[] = ['location', 'camera', 'mediaLibrary', 'contacts'];
 
 export default function SettingsScreen() {
+  const { t, i18n } = useTranslation();
   const { clearAllData } = useData();
   const { mode, primaryId, setMode, setPrimaryId, colors } = useAppTheme();
   const [permissionStates, setPermissionStates] = useState<Record<AppPermission, PermissionState>>({
@@ -37,7 +40,7 @@ export default function SettingsScreen() {
   const [isClearing, setIsClearing] = useState(false);
 
   const version = Constants.expoConfig?.version ?? '1.0.0';
-  const appName = Constants.expoConfig?.name ?? 'GoNext';
+  const appName = Constants.expoConfig?.name ?? t('common.appName');
 
   const loadPermissions = useCallback(async () => {
     const entries = await Promise.all(
@@ -70,8 +73,8 @@ export default function SettingsScreen() {
         getPermissionLabel(permission),
         getPermissionHint(permission, state),
         [
-          { text: 'Отмена', style: 'cancel' },
-          { text: 'Настройки', onPress: () => void openSystemSettings() },
+          { text: t('common.cancel'), style: 'cancel' },
+          { text: t('common.settings'), onPress: () => void openSystemSettings() },
         ]
       );
     }
@@ -82,30 +85,30 @@ export default function SettingsScreen() {
     try {
       await clearAllData();
       setClearDialogVisible(false);
-      Alert.alert('Готово', 'Все данные приложения удалены.');
+      Alert.alert(t('common.done'), t('settings.clearSuccess'));
     } catch {
-      Alert.alert('Ошибка', 'Не удалось очистить данные.');
+      Alert.alert(t('common.error'), t('settings.clearFailed'));
     } finally {
       setIsClearing(false);
     }
   };
 
   return (
-    <ScreenLayout title="Настройки">
+    <ScreenLayout title={t('settings.title')}>
       <ScrollView contentContainerStyle={styles.content}>
         <FormPanel style={styles.panel}>
-          <Text variant="titleMedium">О приложении</Text>
+          <Text variant="titleMedium">{t('settings.about')}</Text>
           <List.Item
             title={appName}
-            description={`Версия ${version}`}
+            description={t('settings.version', { version })}
             left={(props) => <List.Icon {...props} icon="information-outline" />}
           />
         </FormPanel>
 
         <FormPanel style={styles.panel}>
-          <Text variant="titleMedium">Оформление</Text>
+          <Text variant="titleMedium">{t('settings.appearance')}</Text>
           <Text variant="bodySmall" style={styles.sectionHint}>
-            В тёмной теме фоновое изображение скрывается.
+            {t('settings.darkThemeHint')}
           </Text>
           <SegmentedButtons
             value={mode}
@@ -115,12 +118,12 @@ export default function SettingsScreen() {
               }
             }}
             buttons={[
-              { value: 'light', label: 'Светлая', icon: 'white-balance-sunny' },
-              { value: 'dark', label: 'Тёмная', icon: 'moon-waning-crescent' },
+              { value: 'light', label: t('settings.themeLight'), icon: 'white-balance-sunny' },
+              { value: 'dark', label: t('settings.themeDark'), icon: 'moon-waning-crescent' },
             ]}
           />
           <Text variant="labelLarge" style={styles.colorLabel}>
-            Основной цвет
+            {t('settings.primaryColor')}
           </Text>
           <PrimaryColorPicker
             value={primaryId}
@@ -129,9 +132,25 @@ export default function SettingsScreen() {
         </FormPanel>
 
         <FormPanel style={styles.panel}>
-          <Text variant="titleMedium">Разрешения</Text>
+          <Text variant="titleMedium">{t('settings.language')}</Text>
+          <SegmentedButtons
+            value={i18n.language}
+            onValueChange={(value) => {
+              if (value === 'ru' || value === 'en') {
+                void changeLanguage(value as AppLanguage);
+              }
+            }}
+            buttons={[
+              { value: 'ru', label: t('settings.languageRu') },
+              { value: 'en', label: t('settings.languageEn') },
+            ]}
+          />
+        </FormPanel>
+
+        <FormPanel style={styles.panel}>
+          <Text variant="titleMedium">{t('settings.permissions')}</Text>
           <Text variant="bodySmall" style={styles.sectionHint}>
-            Управление доступом к геолокации, камере и галерее.
+            {t('settings.permissionsHint')}
           </Text>
           {PERMISSIONS.map((permission, index) => {
             const state = permissionStates[permission];
@@ -161,7 +180,7 @@ export default function SettingsScreen() {
                       compact
                       onPress={() => void handleRequestPermission(permission)}
                     >
-                      {state === 'denied' ? 'Настройки' : 'Запросить'}
+                      {state === 'denied' ? t('common.settings') : t('common.request')}
                     </Button>
                   )}
                 />
@@ -174,9 +193,9 @@ export default function SettingsScreen() {
         </FormPanel>
 
         <FormPanel style={styles.panel}>
-          <Text variant="titleMedium">Данные</Text>
+          <Text variant="titleMedium">{t('settings.data')}</Text>
           <Text variant="bodySmall" style={styles.sectionHint}>
-            Удаляются все места, поездки, маршруты и фотографии без возможности восстановления.
+            {t('settings.dataHint')}
           </Text>
           <Button
             mode="outlined"
@@ -184,16 +203,16 @@ export default function SettingsScreen() {
             icon="delete-forever"
             onPress={() => setClearDialogVisible(true)}
           >
-            Очистить все данные
+            {t('settings.clearAllData')}
           </Button>
         </FormPanel>
       </ScrollView>
 
       <ConfirmDialog
         visible={clearDialogVisible}
-        title="Очистить все данные?"
-        message="Будут удалены все места, поездки, маршруты и фотографии. Это действие нельзя отменить."
-        confirmLabel="Очистить"
+        title={t('settings.clearAllTitle')}
+        message={t('settings.clearAllMessage')}
+        confirmLabel={t('common.clear')}
         onConfirm={() => void handleClearAllData()}
         onDismiss={() => setClearDialogVisible(false)}
       />
@@ -204,7 +223,7 @@ export default function SettingsScreen() {
             variant="bodyMedium"
             style={[styles.overlayText, { backgroundColor: colors.surface }]}
           >
-            Очистка данных...
+            {t('settings.clearing')}
           </Text>
         </View>
       ) : null}

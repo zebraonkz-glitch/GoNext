@@ -2,6 +2,7 @@ import { type Href, router, useFocusEffect } from 'expo-router';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useCallback, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { FAB } from 'react-native-paper';
 
 import { EmptyState } from '../../components/EmptyState';
@@ -13,6 +14,7 @@ import { useTrips } from '../../hooks/useTrips';
 import type { TripStats } from '../../types';
 
 export default function TripsListScreen() {
+  const { t } = useTranslation();
   const db = useSQLiteContext();
   const { trips, isLoading, refreshTrips } = useTrips();
   const [stats, setStats] = useState<Record<string, TripStats>>({});
@@ -54,13 +56,13 @@ export default function TripsListScreen() {
 
   return (
     <View style={styles.container}>
-      <ScreenLayout title="Поездки">
+      <ScreenLayout title={t('trips.title')}>
         {isLoading && trips.length === 0 ? (
           <LoadingIndicator />
         ) : trips.length === 0 ? (
           <EmptyState
-            title="Список поездок пуст"
-            message="Нажмите «+», чтобы создать первую поездку."
+            title={t('trips.emptyTitle')}
+            message={t('trips.emptyMessage')}
           />
         ) : (
           <FlatList
@@ -83,7 +85,7 @@ export default function TripsListScreen() {
         icon="plus"
         style={styles.fab}
         onPress={() => router.push('/trips/new' as Href)}
-        label="Создать"
+        label={t('common.create')}
       />
     </View>
   );

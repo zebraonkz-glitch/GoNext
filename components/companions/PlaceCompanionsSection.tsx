@@ -1,5 +1,6 @@
 import { type Href, router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Button, Text } from 'react-native-paper';
 
 import { CompanionCard } from './CompanionCard';
@@ -16,22 +17,24 @@ export function PlaceCompanionsSection({
   onLink,
   onUnlink,
 }: PlaceCompanionsSectionProps) {
+  const { t } = useTranslation();
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text variant="titleMedium">Попутчики</Text>
+        <Text variant="titleMedium">{t('placeCompanions.title')}</Text>
         <Button
           mode="text"
           compact
           onPress={() => router.push('/companions' as Href)}
         >
-          Все контакты
+          {t('placeCompanions.allContacts')}
         </Button>
       </View>
 
       {companions.length === 0 ? (
         <Text variant="bodyMedium" style={styles.empty}>
-          К этому месту пока не привязаны попутчики
+          {t('placeCompanions.empty')}
         </Text>
       ) : (
         companions.map((companion) => (
@@ -45,7 +48,7 @@ export function PlaceCompanionsSection({
       )}
 
       <Button mode="outlined" icon="account-plus" onPress={onLink} style={styles.linkButton}>
-        Привязать попутчика
+        {t('placeCompanions.link')}
       </Button>
     </View>
   );

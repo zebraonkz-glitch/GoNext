@@ -1,5 +1,6 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
+import i18n from '../i18n';
 import type { Companion, CreateCompanionInput, UpdateCompanionInput } from '../types';
 import { generateId } from '../utils/id';
 import { mapCompanionRow } from './mappers';
@@ -39,7 +40,7 @@ export async function createCompanion(
 
   const companion = await getCompanionById(db, id);
   if (!companion) {
-    throw new Error('Не удалось создать попутчика');
+    throw new Error(i18n.t('companions.createFailed'));
   }
   return companion;
 }

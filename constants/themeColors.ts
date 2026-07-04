@@ -12,7 +12,6 @@ export type ThemePrimaryId =
 
 export interface ThemePrimaryOption {
   id: ThemePrimaryId;
-  label: string;
   light: string;
   dark: string;
 }
@@ -20,16 +19,16 @@ export interface ThemePrimaryOption {
 export const DEFAULT_THEME_PRIMARY_ID: ThemePrimaryId = 'blue';
 
 export const THEME_PRIMARY_OPTIONS: ThemePrimaryOption[] = [
-  { id: 'blue', label: 'Синий', light: '#1565C0', dark: '#90CAF9' },
-  { id: 'teal', label: 'Бирюзовый', light: '#00695C', dark: '#80CBC4' },
-  { id: 'green', label: 'Зелёный', light: '#2E7D32', dark: '#81C784' },
-  { id: 'orange', label: 'Оранжевый', light: '#E65100', dark: '#FFB74D' },
-  { id: 'red', label: 'Красный', light: '#C62828', dark: '#E57373' },
-  { id: 'pink', label: 'Розовый', light: '#AD1457', dark: '#F06292' },
-  { id: 'purple', label: 'Фиолетовый', light: '#6A1B9A', dark: '#BA68C8' },
-  { id: 'indigo', label: 'Индиго', light: '#283593', dark: '#7986CB' },
-  { id: 'brown', label: 'Коричневый', light: '#4E342E', dark: '#BCAAA4' },
-  { id: 'cyan', label: 'Голубой', light: '#00838F', dark: '#4DD0E1' },
+  { id: 'blue', light: '#1565C0', dark: '#90CAF9' },
+  { id: 'teal', light: '#00695C', dark: '#80CBC4' },
+  { id: 'green', light: '#2E7D32', dark: '#81C784' },
+  { id: 'orange', light: '#E65100', dark: '#FFB74D' },
+  { id: 'red', light: '#C62828', dark: '#E57373' },
+  { id: 'pink', light: '#AD1457', dark: '#F06292' },
+  { id: 'purple', light: '#6A1B9A', dark: '#BA68C8' },
+  { id: 'indigo', light: '#283593', dark: '#7986CB' },
+  { id: 'brown', light: '#4E342E', dark: '#BCAAA4' },
+  { id: 'cyan', light: '#00838F', dark: '#4DD0E1' },
 ];
 
 const themePrimaryMap = new Map(THEME_PRIMARY_OPTIONS.map((option) => [option.id, option]));

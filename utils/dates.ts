@@ -1,13 +1,15 @@
+import i18n, { getDateLocale } from '../i18n';
+
 export function formatDate(iso: string | null): string {
   if (!iso) {
     return '—';
   }
-  return new Date(iso).toLocaleDateString('ru-RU');
+  return new Date(iso).toLocaleDateString(getDateLocale());
 }
 
 export function formatDateRange(startDate: string | null, endDate: string | null): string {
   if (!startDate && !endDate) {
-    return 'Даты не указаны';
+    return i18n.t('dates.notSet');
   }
   if (startDate && endDate) {
     return `${formatDate(startDate)} — ${formatDate(endDate)}`;

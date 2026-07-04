@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Alert, Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useTranslation } from 'react-i18next';
 import { IconButton, Menu, Text } from 'react-native-paper';
 
 import { PhotoViewerModal } from './PhotoViewerModal';
@@ -14,6 +15,7 @@ interface PhotoGalleryProps {
 }
 
 export function PhotoGallery({ photos, onAdd, onDelete, readOnly = false }: PhotoGalleryProps) {
+  const { t } = useTranslation();
   const [menuVisible, setMenuVisible] = useState(false);
   const [viewerPhoto, setViewerPhoto] = useState<Photo | null>(null);
   const [isAdding, setIsAdding] = useState(false);
@@ -22,7 +24,7 @@ export function PhotoGallery({ photos, onAdd, onDelete, readOnly = false }: Phot
     setMenuVisible(false);
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Нет доступа', 'Разрешите доступ к галерее в настройках устройства.');
+      Alert.alert(t('common.noAccess'), t('placeForm.galleryDenied'));
       return;
     }
 
@@ -45,7 +47,7 @@ export function PhotoGallery({ photos, onAdd, onDelete, readOnly = false }: Phot
     setMenuVisible(false);
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Нет доступа', 'Разрешите доступ к камере в настройках устройства.');
+      Alert.alert(t('common.noAccess'), t('placeForm.cameraDenied'));
       return;
     }
 
@@ -64,10 +66,10 @@ export function PhotoGallery({ photos, onAdd, onDelete, readOnly = false }: Phot
   };
 
   const handleDelete = (photo: Photo) => {
-    Alert.alert('Удалить фото?', 'Фотография будет удалена без возможности восстановления.', [
-      { text: 'Отмена', style: 'cancel' },
+    Alert.alert(t('photos.deleteTitle'), t('photos.deleteMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'Удалить',
+        text: t('common.delete'),
         style: 'destructive',
         onPress: () => void onDelete(photo.id),
       },
@@ -77,7 +79,7 @@ export function PhotoGallery({ photos, onAdd, onDelete, readOnly = false }: Phot
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text variant="titleMedium">Фотографии</Text>
+        <Text variant="titleMedium">{t('photos.title')}</Text>
         {!readOnly ? (
           <Menu
             visible={menuVisible}
@@ -90,15 +92,15 @@ export function PhotoGallery({ photos, onAdd, onDelete, readOnly = false }: Phot
               />
             }
           >
-            <Menu.Item onPress={() => void pickFromGallery()} title="Из галереи" leadingIcon="image" />
-            <Menu.Item onPress={() => void takePhoto()} title="С камеры" leadingIcon="camera" />
+            <Menu.Item onPress={() => void pickFromGallery()} title={t('common.fromGallery')} leadingIcon="image" />
+            <Menu.Item onPress={() => void takePhoto()} title={t('common.fromCamera')} leadingIcon="camera" />
           </Menu>
         ) : null}
       </View>
 
       {photos.length === 0 ? (
         <Text variant="bodyMedium" style={styles.empty}>
-          Фотографий пока нет
+          {t('photos.empty')}
         </Text>
       ) : (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.gallery}>

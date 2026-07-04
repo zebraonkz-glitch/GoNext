@@ -1,5 +1,6 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
+import i18n from '../i18n';
 import type { CreateTripInput, Trip, UpdateTripInput } from '../types';
 import { generateId } from '../utils/id';
 import { mapTripRow } from './mappers';
@@ -56,7 +57,7 @@ export async function createTrip(db: SQLiteDatabase, input: CreateTripInput): Pr
 
   const trip = await getTripById(db, id);
   if (!trip) {
-    throw new Error('Не удалось создать поездку');
+    throw new Error(i18n.t('trips.createFailed'));
   }
   return trip;
 }

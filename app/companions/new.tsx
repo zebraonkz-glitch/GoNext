@@ -1,5 +1,6 @@
 import { type Href, router } from 'expo-router';
 import { Alert, ScrollView } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { CompanionForm } from '../../components/companions/CompanionForm';
 import { ScreenLayout } from '../../components/ScreenLayout';
@@ -14,23 +15,24 @@ const defaultValues: CreateCompanionInput = {
 };
 
 export default function NewCompanionScreen() {
+  const { t } = useTranslation();
   const { addCompanion } = useCompanions();
 
   const handleSubmit = async (values: CreateCompanionInput) => {
     const companion = await addCompanion(values);
-    Alert.alert('Готово', 'Попутчик сохранён', [
-      { text: 'К списку', onPress: () => router.replace('/companions' as Href) },
+    Alert.alert(t('common.done'), t('companions.saved'), [
+      { text: t('common.toList'), onPress: () => router.replace('/companions' as Href) },
       {
-        text: 'Открыть',
+        text: t('common.open'),
         onPress: () => router.replace(`/companions/${companion.id}` as Href),
       },
     ]);
   };
 
   return (
-    <ScreenLayout title="Новый попутчик">
+    <ScreenLayout title={t('companions.newTitle')}>
       <ScrollView keyboardShouldPersistTaps="handled">
-        <CompanionForm initialValues={defaultValues} onSubmit={handleSubmit} submitLabel="Создать" />
+        <CompanionForm initialValues={defaultValues} onSubmit={handleSubmit} submitLabel={t('common.create')} />
       </ScrollView>
     </ScreenLayout>
   );

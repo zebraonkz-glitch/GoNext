@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Alert, Image, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { useTranslation } from 'react-i18next';
 import { Button, IconButton, Menu, Switch, Text } from 'react-native-paper';
 
 import { FormPanel, PaperTextInput } from '../PaperTextInput';
@@ -43,8 +44,9 @@ export function PlaceForm({
   companions,
   onLinkCompanion,
   onUnlinkCompanion,
-  submitLabel = 'Сохранить',
+  submitLabel,
 }: PlaceFormProps) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const [name, setName] = useState(initialValues.name);
   const [description, setDescription] = useState(initialValues.description);
@@ -69,8 +71,8 @@ export function PlaceForm({
       setLatitudeText(formatCoordinate(coords.latitude));
       setLongitudeText(formatCoordinate(coords.longitude));
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Не удалось получить координаты';
-      Alert.alert('Геолокация', message);
+      const message = error instanceof Error ? error.message : t('location.coordinatesFailed');
+      Alert.alert(t('placeForm.geolocation'), message);
     } finally {
       setIsLocating(false);
     }
@@ -87,7 +89,7 @@ export function PlaceForm({
   const pickFromGallery = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Нет доступа', 'Разрешите доступ к галерее в настройках устройства.');
+      Alert.alert(t('common.noAccess'), t('placeForm.galleryDenied'));
       return;
     }
     setIsAddingPhoto(true);
@@ -103,7 +105,7 @@ export function PlaceForm({
   const takePhoto = async () => {
     const permission = await ImagePicker.requestCameraPermissionsAsync();
     if (!permission.granted) {
-      Alert.alert('Нет доступа', 'Разрешите доступ к камере в настройках устройства.');
+      Alert.alert(t('common.noAccess'), t('placeForm.cameraDenied'));
       return;
     }
     setIsAddingPhoto(true);
@@ -117,17 +119,17 @@ export function PlaceForm({
   const handleSubmit = async () => {
     const trimmedName = name.trim();
     if (!trimmedName) {
-      Alert.alert('Ошибка', 'Введите название места');
+      Alert.alert(t('common.error'), t('placeForm.nameRequired'));
       return;
     }
 
     if (latitudeText.trim() && latitude === null) {
-      Alert.alert('Ошибка', 'Некорректная широта');
+      Alert.alert(t('common.error'), t('placeForm.invalidLatitude'));
       return;
     }
 
     if (longitudeText.trim() && longitude === null) {
-      Alert.alert('Ошибка', 'Некорректная долгота');
+      Alert.alert(t('common.error'), t('placeForm.invalidLongitude'));
       return;
     }
 
@@ -136,7 +138,7 @@ export function PlaceForm({
       longitudeText.trim() &&
       !hasValidCoordinates(latitude, longitude)
     ) {
-      Alert.alert('Ошибка', 'Широта должна быть от -90 до 90, долгота — от -180 до 180');
+      Alert.alert(t('common.error'), t('placeForm.invalidCoordinatesRange'));
       return;
     }
 
@@ -163,9 +165,9 @@ export function PlaceForm({
   return (
     <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
       <FormPanel>
-      <PaperTextInput label="Название" value={name} onChangeText={setName} mode="outlined" />
+      <PaperTextInput label={t('placeForm.name')} value={name} onChangeText={setName} mode="outlined" />
       <PaperTextInput
-        label="Описание"
+        label={t('placeForm.description')}
         value={description}
         onChangeText={setDescription}
         mode="outlined"
@@ -175,20 +177,20 @@ export function PlaceForm({
       />
 
       <View style={styles.switchRow}>
-        <Text variant="bodyLarge">Посетить позже</Text>
+        <Text variant="bodyLarge">{t('placeForm.visitLater')}</Text>
         <Switch value={visitlater} onValueChange={setVisitlater} />
       </View>
       <View style={styles.switchRow}>
-        <Text variant="bodyLarge">Понравилось</Text>
+        <Text variant="bodyLarge">{t('placeForm.liked')}</Text>
         <Switch value={liked} onValueChange={setLiked} />
       </View>
 
       <Text variant="titleMedium" style={styles.sectionTitle}>
-        Координаты
+        {t('placeForm.coordinates')}
       </Text>
       <View style={styles.coordsRow}>
         <PaperTextInput
-          label="Широта"
+          label={t('placeForm.latitude')}
           value={latitudeText}
           onChangeText={setLatitudeText}
           mode="outlined"
@@ -196,7 +198,7 @@ export function PlaceForm({
           style={styles.coordInput}
         />
         <PaperTextInput
-          label="Долгота"
+          label={t('placeForm.longitude')}
           value={longitudeText}
           onChangeText={setLongitudeText}
           mode="outlined"
@@ -211,18 +213,18 @@ export function PlaceForm({
         loading={isLocating}
         style={styles.button}
       >
-        Моё местоположение
+        {t('placeForm.myLocation')}
       </Button>
 
       <PlaceMap dd={dd} title={name} />
-      <MapActionButtons dd={dd} label={name || 'Место'} style={styles.mapActions} />
+      <MapActionButtons dd={dd} label={name || t('common.place')} style={styles.mapActions} />
 
       {placeId && onAddPhoto && onRemovePhoto ? (
         <PhotoGallery photos={photos} onAdd={onAddPhoto} onDelete={onRemovePhoto} />
       ) : !placeId ? (
         <View style={styles.pendingPhotos}>
           <View style={styles.pendingHeader}>
-            <Text variant="titleMedium">Фотографии</Text>
+            <Text variant="titleMedium">{t('placeForm.photos')}</Text>
             <Menu
               visible={photoMenuVisible}
               onDismiss={() => setPhotoMenuVisible(false)}
@@ -234,13 +236,13 @@ export function PlaceForm({
                 />
               }
             >
-              <Menu.Item onPress={() => void pickFromGallery()} title="Из галереи" leadingIcon="image" />
-              <Menu.Item onPress={() => void takePhoto()} title="С камеры" leadingIcon="camera" />
+              <Menu.Item onPress={() => void pickFromGallery()} title={t('common.fromGallery')} leadingIcon="image" />
+              <Menu.Item onPress={() => void takePhoto()} title={t('common.fromCamera')} leadingIcon="camera" />
             </Menu>
           </View>
           {pendingUris.length === 0 ? (
             <Text variant="bodyMedium" style={styles.pendingEmpty}>
-              Фото будут сохранены вместе с местом
+              {t('placeForm.photosPendingHint')}
             </Text>
           ) : (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pendingGallery}>
@@ -269,12 +271,12 @@ export function PlaceForm({
       ) : null}
 
       <Button mode="contained" onPress={() => void handleSubmit()} loading={isSaving} style={styles.button}>
-        {submitLabel}
+        {submitLabel ?? t('common.save')}
       </Button>
 
       {onDelete ? (
         <Button mode="outlined" textColor={colors.error} onPress={onDelete} style={styles.button}>
-          Удалить
+          {t('common.delete')}
         </Button>
       ) : null}
       </FormPanel>

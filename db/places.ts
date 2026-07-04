@@ -1,5 +1,6 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
+import i18n from '../i18n';
 import type { CreatePlaceInput, Place, UpdatePlaceInput } from '../types';
 import { generateId } from '../utils/id';
 import { mapPlaceRow } from './mappers';
@@ -38,7 +39,7 @@ export async function createPlace(db: SQLiteDatabase, input: CreatePlaceInput): 
 
   const place = await getPlaceById(db, id);
   if (!place) {
-    throw new Error('Не удалось создать место');
+    throw new Error(i18n.t('errors.createPlaceFailed'));
   }
   return place;
 }

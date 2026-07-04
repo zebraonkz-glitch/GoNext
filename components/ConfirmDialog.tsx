@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Button, Dialog, Portal, Text } from 'react-native-paper';
 
 interface ConfirmDialogProps {
@@ -13,10 +14,12 @@ export function ConfirmDialog({
   visible,
   title,
   message,
-  confirmLabel = 'Удалить',
+  confirmLabel,
   onConfirm,
   onDismiss,
 }: ConfirmDialogProps) {
+  const { t } = useTranslation();
+
   return (
     <Portal>
       <Dialog visible={visible} onDismiss={onDismiss}>
@@ -27,8 +30,8 @@ export function ConfirmDialog({
           </Dialog.Content>
         ) : null}
         <Dialog.Actions>
-          <Button onPress={onDismiss}>Отмена</Button>
-          <Button onPress={onConfirm}>{confirmLabel}</Button>
+          <Button onPress={onDismiss}>{t('common.cancel')}</Button>
+          <Button onPress={onConfirm}>{confirmLabel ?? t('common.delete')}</Button>
         </Dialog.Actions>
       </Dialog>
     </Portal>

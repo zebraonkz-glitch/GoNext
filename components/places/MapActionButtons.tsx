@@ -1,4 +1,5 @@
 import { StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Button, Text } from 'react-native-paper';
 
 import { useAppTheme } from '../../contexts/ThemeProvider';
@@ -13,6 +14,7 @@ interface MapActionButtonsProps {
 }
 
 export function MapActionButtons({ dd, label, style }: MapActionButtonsProps) {
+  const { t } = useTranslation();
   const { latitude, longitude } = dd;
 
   if (!hasValidCoordinates(latitude, longitude)) {
@@ -30,10 +32,10 @@ export function MapActionButtons({ dd, label, style }: MapActionButtonsProps) {
   return (
     <View style={[styles.container, style]}>
       <Button mode="outlined" icon="map-marker" onPress={handleOpenMap} style={styles.button}>
-        Открыть на карте
+        {t('maps.openOnMap')}
       </Button>
       <Button mode="outlined" icon="navigation" onPress={handleOpenNavigator} style={styles.button}>
-        Открыть в навигаторе
+        {t('maps.openInNavigator')}
       </Button>
     </View>
   );
@@ -52,6 +54,7 @@ export function CoordinatesFallback({
   height = 200,
   offline = false,
 }: CoordinatesFallbackProps) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const placeholderStyle = {
     borderRadius: colors.radius,
@@ -63,10 +66,10 @@ export function CoordinatesFallback({
     return (
       <View style={[styles.placeholder, placeholderStyle, { height }]}>
         <Text variant="bodyMedium" style={styles.placeholderText}>
-          Координаты не указаны
+          {t('maps.coordinatesMissing')}
         </Text>
         <Text variant="bodySmall" style={styles.hint}>
-          Введите широту и долготу вручную или нажмите «Моё местоположение»
+          {t('maps.coordinatesHint')}
         </Text>
       </View>
     );
@@ -76,11 +79,11 @@ export function CoordinatesFallback({
     <View style={[styles.placeholder, placeholderStyle, { height }]}>
       {offline ? (
         <Text variant="bodyMedium" style={styles.placeholderText}>
-          Карта недоступна без интернета
+          {t('maps.offlineUnavailable')}
         </Text>
       ) : (
         <Text variant="bodyMedium" style={styles.placeholderText}>
-          Не удалось загрузить карту
+          {t('maps.loadFailed')}
         </Text>
       )}
       <Text variant="titleMedium" style={styles.coordsMain}>
@@ -93,11 +96,11 @@ export function CoordinatesFallback({
       ) : null}
       {offline ? (
         <Text variant="bodySmall" style={styles.hint}>
-          Координаты доступны офлайн. Откройте место во внешнем приложении карт.
+          {t('maps.offlineHint')}
         </Text>
       ) : (
         <Text variant="bodySmall" style={styles.hint}>
-          Проверьте подключение к интернету
+          {t('maps.checkConnection')}
         </Text>
       )}
     </View>

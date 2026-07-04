@@ -3,19 +3,14 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { Linking } from 'react-native';
 
+import i18n from '../i18n';
+
 export type AppPermission = 'location' | 'camera' | 'mediaLibrary' | 'contacts';
 
 export type PermissionState = 'granted' | 'denied' | 'undetermined';
 
-const PERMISSION_LABELS: Record<AppPermission, string> = {
-  location: 'Геолокация',
-  camera: 'Камера',
-  mediaLibrary: 'Галерея',
-  contacts: 'Контакты',
-};
-
 export function getPermissionLabel(permission: AppPermission): string {
-  return PERMISSION_LABELS[permission];
+  return i18n.t(`permissions.${permission}`);
 }
 
 function mapStatus(status: string): PermissionState {
@@ -71,44 +66,19 @@ export async function requestPermission(permission: AppPermission): Promise<Perm
 }
 
 export function getPermissionStatusLabel(state: PermissionState): string {
-  switch (state) {
-    case 'granted':
-      return 'Разрешено';
-    case 'denied':
-      return 'Запрещено';
-    case 'undetermined':
-      return 'Не запрошено';
-  }
+  return i18n.t(`permissions.${state}`);
 }
 
 export function getPermissionHint(permission: AppPermission, state: PermissionState): string {
   if (state === 'granted') {
-    return `${getPermissionLabel(permission)} доступна.`;
+    return i18n.t('permissions.grantedHint', { label: getPermissionLabel(permission) });
   }
 
   if (state === 'undetermined') {
-    switch (permission) {
-      case 'location':
-        return 'Нужна для определения координат места.';
-      case 'camera':
-        return 'Нужна для съёмки фотографий.';
-      case 'mediaLibrary':
-        return 'Нужна для выбора фото из галереи.';
-      case 'contacts':
-        return 'Нужна для выбора попутчиков из телефонной книги.';
-    }
+    return i18n.t(`permissions.${permission}Undetermined`);
   }
 
-  switch (permission) {
-    case 'location':
-      return 'Доступ запрещён. Разрешите геолокацию в настройках устройства.';
-    case 'camera':
-      return 'Доступ запрещён. Разрешите камеру в настройках устройства.';
-    case 'mediaLibrary':
-      return 'Доступ запрещён. Разрешите галерею в настройках устройства.';
-    case 'contacts':
-      return 'Доступ запрещён. Разрешите контакты в настройках устройства.';
-  }
+  return i18n.t(`permissions.${permission}Denied`);
 }
 
 export async function openSystemSettings(): Promise<void> {

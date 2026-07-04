@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Button, Dialog, Portal, Searchbar, Text } from 'react-native-paper';
 
 import { useAppTheme } from '../../contexts/ThemeProvider';
@@ -13,6 +14,7 @@ interface PickContactDialogProps {
 }
 
 export function PickContactDialog({ visible, onDismiss, onSelect }: PickContactDialogProps) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const [contacts, setContacts] = useState<DeviceContactPreview[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,18 +55,18 @@ export function PickContactDialog({ visible, onDismiss, onSelect }: PickContactD
   }, [contacts, searchQuery]);
 
   const emptyMessage = searchQuery
-    ? 'Ничего не найдено'
+    ? t('common.notFound')
     : loadFailed
-      ? 'Контакты не найдены или доступ не предоставлен.'
-      : 'Список контактов пуст';
+      ? t('pickContact.noAccess')
+      : t('pickContact.empty');
 
   return (
     <Portal>
       <Dialog visible={visible} onDismiss={onDismiss} style={styles.dialog}>
-        <Dialog.Title>Выбор из контактов</Dialog.Title>
+        <Dialog.Title>{t('pickContact.title')}</Dialog.Title>
         <Dialog.Content>
           <Searchbar
-            placeholder="Поиск по имени, телефону, email"
+            placeholder={t('pickContact.searchPlaceholder')}
             value={searchQuery}
             onChangeText={setSearchQuery}
             style={[styles.searchbar, getPaperSearchbarStyle(colors)]}
@@ -111,7 +113,7 @@ export function PickContactDialog({ visible, onDismiss, onSelect }: PickContactD
           )}
         </Dialog.Content>
         <Dialog.Actions>
-          <Button onPress={onDismiss}>Закрыть</Button>
+          <Button onPress={onDismiss}>{t('common.close')}</Button>
         </Dialog.Actions>
       </Dialog>
     </Portal>

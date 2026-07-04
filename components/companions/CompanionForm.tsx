@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Alert, Platform, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Button } from 'react-native-paper';
 
 import { PickContactDialog } from './PickContactDialog';
@@ -23,8 +24,9 @@ export function CompanionForm({
   initialValues,
   onSubmit,
   onDelete,
-  submitLabel = 'Сохранить',
+  submitLabel,
 }: CompanionFormProps) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const [name, setName] = useState(initialValues.name);
   const [phone, setPhone] = useState(initialValues.phone);
@@ -55,7 +57,7 @@ export function CompanionForm({
   const handleSubmit = async () => {
     const trimmedName = name.trim();
     if (!trimmedName) {
-      Alert.alert('Ошибка', 'Введите имя попутчика');
+      Alert.alert(t('common.error'), t('companionForm.nameRequired'));
       return;
     }
 
@@ -81,25 +83,25 @@ export function CompanionForm({
         onPress={() => void handlePickFromContacts()}
         style={styles.button}
       >
-        Выбрать из контактов
+        {t('companionForm.pickFromContacts')}
       </Button>
 
-      <PaperTextInput label="Имя *" value={name} onChangeText={setName} />
+      <PaperTextInput label={t('companionForm.name')} value={name} onChangeText={setName} />
       <PaperTextInput
-        label="Телефон"
+        label={t('companionForm.phone')}
         value={phone}
         onChangeText={setPhone}
         keyboardType="phone-pad"
       />
       <PaperTextInput
-        label="Email"
+        label={t('companionForm.email')}
         value={email}
         onChangeText={setEmail}
         keyboardType="email-address"
         autoCapitalize="none"
       />
       <PaperTextInput
-        label="Заметки"
+        label={t('companionForm.notes')}
         value={notes}
         onChangeText={setNotes}
         multiline
@@ -107,12 +109,12 @@ export function CompanionForm({
       />
 
       <Button mode="contained" onPress={() => void handleSubmit()} loading={isSaving} style={styles.button}>
-        {submitLabel}
+        {submitLabel ?? t('common.save')}
       </Button>
 
       {onDelete ? (
         <Button mode="outlined" textColor={colors.error} onPress={onDelete} style={styles.button}>
-          Удалить
+          {t('common.delete')}
         </Button>
       ) : null}
     </FormPanel>

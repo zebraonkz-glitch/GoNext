@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Alert, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Button, Switch, Text } from 'react-native-paper';
 
 import { FormPanel, PaperTextInput } from '../PaperTextInput';
@@ -18,8 +19,9 @@ export function TripForm({
   initialValues,
   onSubmit,
   onDelete,
-  submitLabel = 'Сохранить',
+  submitLabel,
 }: TripFormProps) {
+  const { t } = useTranslation();
   const { colors } = useAppTheme();
   const [title, setTitle] = useState(initialValues.title);
   const [description, setDescription] = useState(initialValues.description);
@@ -31,12 +33,12 @@ export function TripForm({
   const handleSubmit = async () => {
     const trimmedTitle = title.trim();
     if (!trimmedTitle) {
-      Alert.alert('Ошибка', 'Введите название поездки');
+      Alert.alert(t('common.error'), t('tripForm.titleRequired'));
       return;
     }
 
     if (startDate && endDate && startDate > endDate) {
-      Alert.alert('Ошибка', 'Дата начала не может быть позже даты окончания');
+      Alert.alert(t('common.error'), t('tripForm.invalidDateRange'));
       return;
     }
 
@@ -56,9 +58,9 @@ export function TripForm({
 
   return (
     <FormPanel>
-      <PaperTextInput label="Название" value={title} onChangeText={setTitle} mode="outlined" />
+      <PaperTextInput label={t('tripForm.title')} value={title} onChangeText={setTitle} mode="outlined" />
       <PaperTextInput
-        label="Описание"
+        label={t('tripForm.description')}
         value={description}
         onChangeText={setDescription}
         mode="outlined"
@@ -66,23 +68,23 @@ export function TripForm({
         numberOfLines={4}
         style={styles.multiline}
       />
-      <DatePickerField label="Дата начала" value={startDate} onChange={setStartDate} />
-      <DatePickerField label="Дата окончания" value={endDate} onChange={setEndDate} />
+      <DatePickerField label={t('tripForm.startDate')} value={startDate} onChange={setStartDate} />
+      <DatePickerField label={t('tripForm.endDate')} value={endDate} onChange={setEndDate} />
       <View style={styles.switchRow}>
         <View style={styles.switchText}>
-          <Text variant="bodyLarge">Текущая поездка</Text>
+          <Text variant="bodyLarge">{t('tripForm.currentTrip')}</Text>
           <Text variant="bodySmall" style={styles.hint}>
-            Только одна поездка может быть текущей
+            {t('tripForm.currentTripHint')}
           </Text>
         </View>
         <Switch value={current} onValueChange={setCurrent} />
       </View>
       <Button mode="contained" onPress={() => void handleSubmit()} loading={isSaving}>
-        {submitLabel}
+        {submitLabel ?? t('common.save')}
       </Button>
       {onDelete ? (
         <Button mode="outlined" textColor={colors.error} onPress={onDelete}>
-          Удалить поездку
+          {t('tripForm.deleteTrip')}
         </Button>
       ) : null}
     </FormPanel>

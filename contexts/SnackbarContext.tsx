@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Snackbar } from 'react-native-paper';
 
 interface SnackbarContextValue {
@@ -9,6 +10,7 @@ interface SnackbarContextValue {
 const SnackbarContext = createContext<SnackbarContextValue | null>(null);
 
 export function SnackbarProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation();
   const [message, setMessage] = useState('');
   const [visible, setVisible] = useState(false);
 
@@ -38,7 +40,7 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
         onDismiss={() => setVisible(false)}
         duration={4000}
         action={{
-          label: 'OK',
+          label: t('common.ok'),
           onPress: () => setVisible(false),
         }}
       >

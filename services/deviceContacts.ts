@@ -7,6 +7,7 @@ import {
 import { Alert, Platform } from 'react-native';
 
 import type { CreateCompanionInput } from '../types';
+import i18n from '../i18n';
 
 export interface DeviceContactPreview {
   id: string;
@@ -76,8 +77,8 @@ export async function loadDeviceContacts(): Promise<DeviceContactPreview[]> {
   const granted = await requestContactsPermission();
   if (!granted) {
     Alert.alert(
-      'Нет доступа к контактам',
-      'Разрешите доступ к контактам в настройках устройства, чтобы выбрать попутчика из телефонной книги.'
+      i18n.t('contactsService.noAccessTitle'),
+      i18n.t('contactsService.noAccessPickMessage')
     );
     return [];
   }
@@ -90,7 +91,7 @@ export async function loadDeviceContacts(): Promise<DeviceContactPreview[]> {
     .map((row) => mapContactRow(row as ContactRow))
     .filter((contact): contact is DeviceContactPreview => contact !== null);
 
-  return contacts.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+  return contacts.sort((a, b) => a.name.localeCompare(b.name, i18n.language));
 }
 
 export async function pickDeviceContactNative(): Promise<DeviceContactPreview | null> {
@@ -100,7 +101,10 @@ export async function pickDeviceContactNative(): Promise<DeviceContactPreview | 
 
   const granted = await requestContactsPermission();
   if (!granted) {
-    Alert.alert('Нет доступа к контактам', 'Разрешите доступ к контактам в настройках устройства.');
+    Alert.alert(
+      i18n.t('contactsService.noAccessTitle'),
+      i18n.t('contactsService.noAccessMessage')
+    );
     return null;
   }
 

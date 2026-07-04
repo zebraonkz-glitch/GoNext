@@ -1,5 +1,6 @@
 import type { SQLiteDatabase } from 'expo-sqlite';
 
+import i18n from '../i18n';
 import type { Photo, PhotoEntityType } from '../types';
 import { generateId } from '../utils/id';
 import { mapPhotoRow } from './mappers';
@@ -46,7 +47,7 @@ export async function createPhotoRecord(
 
   const photo = await getPhotoById(db, id);
   if (!photo) {
-    throw new Error('Не удалось сохранить фото');
+    throw new Error(i18n.t('photos.saveFailed'));
   }
   return photo;
 }

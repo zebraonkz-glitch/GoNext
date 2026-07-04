@@ -1,6 +1,7 @@
 import { type Href, router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Alert, ScrollView, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Button, SegmentedButtons, Text } from 'react-native-paper';
 
 import { AddPlaceToTripDialog } from '../../components/trips/AddPlaceToTripDialog';
@@ -17,6 +18,7 @@ import { toISODateString } from '../../utils/dates';
 type ViewMode = 'plan' | 'diary';
 
 export default function TripDetailScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const {
     places,
@@ -52,8 +54,8 @@ export default function TripDetailScreen() {
     try {
       const loadedTrip = await getTrip(id);
       if (!loadedTrip) {
-        Alert.alert('Ошибка', 'Поездка не найдена', [
-          { text: 'OK', onPress: () => router.back() },
+        Alert.alert(t('common.error'), t('trips.notFound'), [
+          { text: t('common.ok'), onPress: () => router.back() },
         ]);
         return;
       }
@@ -96,7 +98,7 @@ export default function TripDetailScreen() {
     const updated = await editTrip(id, values);
     if (updated) {
       setTrip(updated);
-      Alert.alert('Готово', 'Данные поездки сохранены');
+      Alert.alert(t('common.done'), t('trips.saved'));
     }
   };
 
@@ -163,10 +165,10 @@ export default function TripDetailScreen() {
   };
 
   const handleRemoveTripPlace = async (tripPlaceId: string) => {
-    Alert.alert('Убрать из маршрута?', 'Место останется в списке мест.', [
-      { text: 'Отмена', style: 'cancel' },
+    Alert.alert(t('trips.removeFromRouteTitle'), t('trips.removeFromRouteMessage'), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'Убрать',
+        text: t('common.remove'),
         style: 'destructive',
         onPress: async () => {
           await removeTripPlace(tripPlaceId);
@@ -197,7 +199,7 @@ export default function TripDetailScreen() {
 
   if (isLoading || !trip) {
     return (
-      <ScreenLayout title="Поездка">
+      <ScreenLayout title={t('trips.editTitle')}>
         <LoadingIndicator />
       </ScreenLayout>
     );
@@ -207,7 +209,7 @@ export default function TripDetailScreen() {
     <ScreenLayout title={trip.title}>
       <ScrollView contentContainerStyle={styles.container}>
         <Text variant="titleMedium" style={styles.sectionTitle}>
-          Данные поездки
+          {t('trips.details')}
         </Text>
         <TripForm
           initialValues={{
@@ -222,28 +224,28 @@ export default function TripDetailScreen() {
         />
 
         <Text variant="titleMedium" style={styles.sectionTitle}>
-          Маршрут
+          {t('trips.route')}
         </Text>
         <SegmentedButtons
           value={viewMode}
           onValueChange={(value) => setViewMode(value as ViewMode)}
           buttons={[
-            { value: 'plan', label: 'План' },
-            { value: 'diary', label: 'Дневник' },
+            { value: 'plan', label: t('trips.plan') },
+            { value: 'diary', label: t('trips.diary') },
           ]}
           style={styles.segmented}
         />
         <Button mode="outlined" icon="plus" onPress={() => setAddPlaceVisible(true)}>
-          Добавить место
+          {t('trips.addPlace')}
         </Button>
 
         {displayedRoute.length === 0 ? (
           <EmptyState
-            title={viewMode === 'diary' ? 'Дневник пуст' : 'Маршрут пуст'}
+            title={viewMode === 'diary' ? t('trips.diaryEmptyTitle') : t('trips.routeEmptyTitle')}
             message={
               viewMode === 'diary'
-                ? 'Отметьте места как посещённые, чтобы они появились в дневнике.'
-                : 'Добавьте места в маршрут поездки.'
+                ? t('trips.diaryEmptyMessage')
+                : t('trips.routeEmptyMessage')
             }
           />
         ) : (
@@ -282,8 +284,8 @@ export default function TripDetailScreen() {
 
       <ConfirmDialog
         visible={deleteVisible}
-        title="Удалить поездку?"
-        message={`Поездка «${trip.title}» и весь маршрут будут удалены.`}
+        title={t('trips.deleteTitle')}
+        message={t('trips.deleteMessage', { title: trip.title })}
         onConfirm={() => void handleDeleteTrip()}
         onDismiss={() => setDeleteVisible(false)}
       />
