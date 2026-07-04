@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ActivityIndicator, Button, Dialog, Portal, Searchbar, Text } from 'react-native-paper';
 
 import { useAppTheme } from '../../contexts/ThemeProvider';
-import { getPaperInputStyle, getPaperSearchbarStyle } from '../../constants/ui';
 import { loadDeviceContacts, type DeviceContactPreview } from '../../services/deviceContacts';
 
 interface PickContactDialogProps {
@@ -64,13 +63,12 @@ export function PickContactDialog({ visible, onDismiss, onSelect }: PickContactD
     <Portal>
       <Dialog visible={visible} onDismiss={onDismiss} style={styles.dialog}>
         <Dialog.Title>{t('pickContact.title')}</Dialog.Title>
-        <Dialog.Content>
+        <Dialog.Content style={styles.content}>
           <Searchbar
             placeholder={t('pickContact.searchPlaceholder')}
             value={searchQuery}
             onChangeText={setSearchQuery}
-            style={[styles.searchbar, getPaperSearchbarStyle(colors)]}
-            inputStyle={getPaperInputStyle(colors)}
+            style={[styles.searchbar, { backgroundColor: colors.surface, borderRadius: colors.radius }]}
           />
 
           {isLoading ? (
@@ -86,28 +84,27 @@ export function PickContactDialog({ visible, onDismiss, onSelect }: PickContactD
               data={filteredContacts}
               keyExtractor={(item) => item.id}
               style={styles.list}
+              contentContainerStyle={styles.listContent}
               keyboardShouldPersistTaps="handled"
               renderItem={({ item }) => (
-                <Button
-                  mode="text"
+                <Pressable
                   onPress={() => onSelect(item)}
-                  style={styles.itemButton}
-                  contentStyle={styles.itemContent}
+                  style={({ pressed }) => [styles.itemRow, pressed && styles.itemPressed]}
                 >
-                  <View style={styles.itemText}>
-                    <Text variant="bodyLarge">{item.name}</Text>
-                    {item.phone ? (
-                      <Text variant="bodySmall" style={styles.detail}>
-                        {item.phone}
-                      </Text>
-                    ) : null}
-                    {item.email ? (
-                      <Text variant="bodySmall" style={styles.detail}>
-                        {item.email}
-                      </Text>
-                    ) : null}
-                  </View>
-                </Button>
+                  <Text variant="bodyLarge" style={styles.itemName} numberOfLines={2}>
+                    {item.name}
+                  </Text>
+                  {item.phone ? (
+                    <Text variant="bodySmall" style={styles.detail} numberOfLines={1} ellipsizeMode="middle">
+                      {item.phone}
+                    </Text>
+                  ) : null}
+                  {item.email ? (
+                    <Text variant="bodySmall" style={styles.detail} numberOfLines={1} ellipsizeMode="middle">
+                      {item.email}
+                    </Text>
+                  ) : null}
+                </Pressable>
               )}
             />
           )}
@@ -123,29 +120,44 @@ export function PickContactDialog({ visible, onDismiss, onSelect }: PickContactD
 const styles = StyleSheet.create({
   dialog: {
     maxHeight: '85%',
+    alignSelf: 'center',
+    width: '92%',
+    maxWidth: 480,
+  },
+  content: {
+    paddingHorizontal: 0,
   },
   searchbar: {
     marginBottom: 8,
+    marginHorizontal: 24,
   },
   list: {
     maxHeight: 320,
   },
-  itemButton: {
-    alignItems: 'flex-start',
+  listContent: {
+    paddingHorizontal: 16,
   },
-  itemContent: {
-    justifyContent: 'flex-start',
-  },
-  itemText: {
-    alignItems: 'flex-start',
+  itemRow: {
+    width: '100%',
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 8,
     gap: 2,
+  },
+  itemPressed: {
+    opacity: 0.7,
+  },
+  itemName: {
+    flexShrink: 1,
   },
   detail: {
     opacity: 0.7,
+    flexShrink: 1,
   },
   empty: {
     opacity: 0.7,
     paddingVertical: 16,
+    paddingHorizontal: 24,
   },
   centered: {
     paddingVertical: 24,
