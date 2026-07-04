@@ -203,6 +203,14 @@
     "themeLight": "Светлая",
     "themeDark": "Тёмная",
     "primaryColor": "Основной цвет",
+    "backgroundImage": "Фоновое изображение",
+    "backgroundImageHint": "Доступно только в светлой теме. Можно выбрать своё фото из галереи.",
+    "backgroundCustom": "Своё изображение",
+    "pickBackground": "Выбрать из галереи",
+    "backgroundSaveFailed": "Не удалось сохранить фоновое изображение",
+    "backgrounds": {
+      "default": "Стандартный фон"
+    },
     "language": "Язык",
     "languageRu": "Русский",
     "languageEn": "English",

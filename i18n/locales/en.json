@@ -203,6 +203,14 @@
     "themeLight": "Light",
     "themeDark": "Dark",
     "primaryColor": "Primary color",
+    "backgroundImage": "Background image",
+    "backgroundImageHint": "Available in light theme only. You can pick your own photo from the gallery.",
+    "backgroundCustom": "Custom image",
+    "pickBackground": "Choose from gallery",
+    "backgroundSaveFailed": "Failed to save background image",
+    "backgrounds": {
+      "default": "Default background"
+    },
     "language": "Language",
     "languageRu": "Русский",
     "languageEn": "English",

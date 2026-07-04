@@ -3,7 +3,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { SQLiteProvider } from 'expo-sqlite';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Platform } from 'react-native';
 import { I18nextProvider } from 'react-i18next';
 
@@ -17,6 +17,10 @@ import i18n, { initI18n } from '../i18n';
 import { materialCommunityIconFont } from '../theme/paperSettings';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
+
+const handleDatabaseError = (error: Error) => {
+  console.error('SQLite initialization failed:', error);
+};
 
 function RootNavigator() {
   const { isDark } = useAppTheme();
@@ -43,6 +47,9 @@ function RootNavigator() {
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts(materialCommunityIconFont);
   const [i18nReady, setI18nReady] = useState(false);
+  const onInitDatabase = useCallback(async (db: Parameters<typeof initDatabase>[0]) => {
+    await initDatabase(db);
+  }, []);
 
   useEffect(() => {
     void initI18n().finally(() => setI18nReady(true));
@@ -60,15 +67,19 @@ export default function RootLayout() {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <ThemeProvider>
-        <SQLiteProvider databaseName={DATABASE_NAME} onInit={initDatabase}>
+      <SQLiteProvider
+        databaseName={DATABASE_NAME}
+        onInit={onInitDatabase}
+        onError={handleDatabaseError}
+      >
+        <ThemeProvider>
           <SnackbarProvider>
             <DataProvider>
               <RootNavigator />
             </DataProvider>
           </SnackbarProvider>
-        </SQLiteProvider>
-      </ThemeProvider>
+        </ThemeProvider>
+      </SQLiteProvider>
     </I18nextProvider>
   );
 }

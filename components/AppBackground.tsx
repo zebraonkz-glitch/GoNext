@@ -3,8 +3,6 @@ import { Image, ImageBackground, Platform, StyleSheet, View, type ViewStyle } fr
 
 import { useAppTheme } from '../contexts/ThemeProvider';
 
-const backgroundSource = require('../assets/backgrounds/gonext-bg.png');
-
 const webRootStyle =
   Platform.OS === 'web' ? ({ minHeight: '100vh', width: '100%' } as unknown as ViewStyle) : undefined;
 
@@ -13,7 +11,7 @@ interface AppBackgroundProps {
 }
 
 export function AppBackground({ children }: AppBackgroundProps) {
-  const { isDark, colors } = useAppTheme();
+  const { isDark, colors, backgroundSource, customBackgroundUri, backgroundId } = useAppTheme();
 
   if (isDark) {
     return (
@@ -26,7 +24,12 @@ export function AppBackground({ children }: AppBackgroundProps) {
   if (Platform.OS === 'web') {
     return (
       <View style={[styles.background, webRootStyle]}>
-        <Image source={backgroundSource} style={styles.webBackgroundImage} resizeMode="cover" />
+        <Image
+          key={backgroundId === 'custom' ? customBackgroundUri ?? 'custom' : 'built-in'}
+          source={backgroundSource}
+          style={styles.webBackgroundImage}
+          resizeMode="cover"
+        />
         <View style={styles.foreground}>{children}</View>
       </View>
     );

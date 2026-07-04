@@ -8,6 +8,7 @@ import { Button, Divider, List, SegmentedButtons, Text } from 'react-native-pape
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { FormPanel } from '../../components/PaperTextInput';
 import { PrimaryColorPicker } from '../../components/settings/PrimaryColorPicker';
+import { BackgroundPicker } from '../../components/settings/BackgroundPicker';
 import { ScreenLayout } from '../../components/ScreenLayout';
 import { useAppTheme } from '../../contexts/ThemeProvider';
 import { type ThemeMode, type ThemePrimaryId } from '../../constants/ui';
@@ -29,7 +30,7 @@ const PERMISSIONS: AppPermission[] = ['location', 'camera', 'mediaLibrary', 'con
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const { clearAllData } = useData();
-  const { mode, primaryId, setMode, setPrimaryId, colors } = useAppTheme();
+  const { mode, primaryId, backgroundId, customBackgroundUri, setMode, setPrimaryId, setBuiltInBackground, setCustomBackground, colors } = useAppTheme();
   const [permissionStates, setPermissionStates] = useState<Record<AppPermission, PermissionState>>({
     location: 'undetermined',
     camera: 'undetermined',
@@ -128,6 +129,18 @@ export default function SettingsScreen() {
           <PrimaryColorPicker
             value={primaryId}
             onChange={(id: ThemePrimaryId) => void setPrimaryId(id)}
+          />
+          <Text variant="labelLarge" style={styles.colorLabel}>
+            {t('settings.backgroundImage')}
+          </Text>
+          <Text variant="bodySmall" style={styles.sectionHint}>
+            {t('settings.backgroundImageHint')}
+          </Text>
+          <BackgroundPicker
+            backgroundId={backgroundId}
+            customUri={customBackgroundUri}
+            onSelectBuiltIn={(id) => void setBuiltInBackground(id)}
+            onSelectCustom={setCustomBackground}
           />
         </FormPanel>
 

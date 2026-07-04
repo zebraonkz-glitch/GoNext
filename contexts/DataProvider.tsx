@@ -116,8 +116,39 @@ export function DataProvider({ children }: { children: ReactNode }) {
   }, [refreshPlaces, refreshTrips, refreshCompanions, showError]);
 
   useEffect(() => {
-    void refreshAll();
-  }, [refreshAll]);
+    let cancelled = false;
+
+    async function loadInitialData() {
+      setIsLoading(true);
+      try {
+        const [placesData, tripsData, companionsData] = await Promise.all([
+          placeRepo.getAllPlaces(db),
+          tripRepo.getAllTrips(db),
+          companionRepo.getAllCompanions(db),
+        ]);
+        if (cancelled) {
+          return;
+        }
+        setPlaces(placesData);
+        setTrips(tripsData);
+        setCompanions(companionsData);
+      } catch (error) {
+        if (!cancelled) {
+          showError(getDbErrorMessage(error));
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void loadInitialData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [db, showError]);
 
   const addPlace = useCallback(
     async (input: CreatePlaceInput) => {
