@@ -6,9 +6,10 @@ import { Button, Divider, List, SegmentedButtons, Text } from 'react-native-pape
 
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { FormPanel } from '../../components/PaperTextInput';
+import { PrimaryColorPicker } from '../../components/settings/PrimaryColorPicker';
 import { ScreenLayout } from '../../components/ScreenLayout';
 import { useAppTheme } from '../../contexts/ThemeProvider';
-import { type ThemeMode } from '../../constants/ui';
+import { type ThemeMode, type ThemePrimaryId } from '../../constants/ui';
 import { useData } from '../../contexts/DataProvider';
 import {
   type AppPermission,
@@ -25,7 +26,7 @@ const PERMISSIONS: AppPermission[] = ['location', 'camera', 'mediaLibrary', 'con
 
 export default function SettingsScreen() {
   const { clearAllData } = useData();
-  const { mode, setMode, colors } = useAppTheme();
+  const { mode, primaryId, setMode, setPrimaryId, colors } = useAppTheme();
   const [permissionStates, setPermissionStates] = useState<Record<AppPermission, PermissionState>>({
     location: 'undetermined',
     camera: 'undetermined',
@@ -117,6 +118,13 @@ export default function SettingsScreen() {
               { value: 'light', label: 'Светлая', icon: 'white-balance-sunny' },
               { value: 'dark', label: 'Тёмная', icon: 'moon-waning-crescent' },
             ]}
+          />
+          <Text variant="labelLarge" style={styles.colorLabel}>
+            Основной цвет
+          </Text>
+          <PrimaryColorPicker
+            value={primaryId}
+            onChange={(id: ThemePrimaryId) => void setPrimaryId(id)}
           />
         </FormPanel>
 
@@ -213,6 +221,9 @@ const styles = StyleSheet.create({
   },
   sectionHint: {
     opacity: 0.7,
+  },
+  colorLabel: {
+    marginTop: 8,
   },
   permissionHint: {
     opacity: 0.6,
