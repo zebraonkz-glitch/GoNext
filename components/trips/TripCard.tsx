@@ -1,7 +1,8 @@
 import { StyleSheet, View } from 'react-native';
 import { Card, Chip, ProgressBar, Text } from 'react-native-paper';
 
-import { paperCardStyle, UI } from '../../constants/ui';
+import { useAppTheme } from '../../contexts/ThemeProvider';
+import { paperCardStyle } from '../../constants/ui';
 
 import type { Trip, TripStats } from '../../types';
 import { formatDateRange } from '../../utils/dates';
@@ -13,10 +14,18 @@ interface TripCardProps {
 }
 
 export function TripCard({ trip, stats, onPress }: TripCardProps) {
+  const { colors } = useAppTheme();
   const progress = stats.total > 0 ? stats.visited / stats.total : 0;
 
   return (
-    <Card style={[styles.card, paperCardStyle, trip.current && styles.currentCard]} onPress={onPress}>
+    <Card
+      style={[
+        styles.card,
+        paperCardStyle,
+        trip.current && { borderWidth: 2, borderColor: colors.primary },
+      ]}
+      onPress={onPress}
+    >
       <Card.Content style={styles.content}>
         <View style={styles.header}>
           <Text variant="titleMedium" style={styles.title}>
@@ -49,10 +58,6 @@ const styles = StyleSheet.create({
   card: {
     marginHorizontal: 16,
     marginVertical: 6,
-  },
-  currentCard: {
-    borderWidth: 2,
-    borderColor: UI.primary,
   },
   content: {
     gap: 8,

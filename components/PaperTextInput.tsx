@@ -2,12 +2,16 @@ import type { ComponentProps, ReactNode } from 'react';
 import { StyleSheet, View, type ViewStyle } from 'react-native';
 import { TextInput } from 'react-native-paper';
 
-import { UI, paperInputStyle } from '../constants/ui';
+import { useAppTheme } from '../contexts/ThemeProvider';
 
 type PaperTextInputProps = ComponentProps<typeof TextInput>;
 
 export function PaperTextInput({ style, ...props }: PaperTextInputProps) {
-  return <TextInput {...props} style={[paperInputStyle, style]} />;
+  const { colors } = useAppTheme();
+
+  return (
+    <TextInput {...props} style={[{ backgroundColor: colors.surface }, style]} />
+  );
 }
 
 interface FormPanelProps {
@@ -16,12 +20,17 @@ interface FormPanelProps {
 }
 
 export function FormPanel({ children, style }: FormPanelProps) {
-  return <View style={[styles.panel, style]}>{children}</View>;
+  const { colors } = useAppTheme();
+
+  return (
+    <View style={[styles.panel, { backgroundColor: colors.surface }, style]}>
+      {children}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   panel: {
-    backgroundColor: UI.surface,
     borderRadius: 12,
     padding: 16,
     margin: 16,

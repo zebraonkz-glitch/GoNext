@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { Button, Text } from 'react-native-paper';
 
-import { UI } from '../../constants/ui';
+import { useAppTheme } from '../../contexts/ThemeProvider';
 import type { DecimalDegrees } from '../../types';
 import { formatCoordinate, hasValidCoordinates } from '../../utils/coordinates';
 import { openPlaceInNavigator, openPlaceOnMap } from '../../services/maps';
@@ -52,11 +52,16 @@ export function CoordinatesFallback({
   height = 200,
   offline = false,
 }: CoordinatesFallbackProps) {
+  const { colors } = useAppTheme();
+  const placeholderStyle = {
+    borderRadius: colors.radius,
+    backgroundColor: colors.surfaceMuted,
+  };
   const { latitude, longitude } = dd;
 
   if (!hasValidCoordinates(latitude, longitude)) {
     return (
-      <View style={[styles.placeholder, { height }]}>
+      <View style={[styles.placeholder, placeholderStyle, { height }]}>
         <Text variant="bodyMedium" style={styles.placeholderText}>
           Координаты не указаны
         </Text>
@@ -68,7 +73,7 @@ export function CoordinatesFallback({
   }
 
   return (
-    <View style={[styles.placeholder, { height }]}>
+    <View style={[styles.placeholder, placeholderStyle, { height }]}>
       {offline ? (
         <Text variant="bodyMedium" style={styles.placeholderText}>
           Карта недоступна без интернета
@@ -107,8 +112,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   placeholder: {
-    borderRadius: UI.radius,
-    backgroundColor: UI.surfaceMuted,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 12,

@@ -4,7 +4,7 @@ import { Button, Switch, Text } from 'react-native-paper';
 
 import { FormPanel, PaperTextInput } from '../PaperTextInput';
 import { DatePickerField } from './DatePickerField';
-import { UI } from '../../constants/ui';
+import { useAppTheme } from '../../contexts/ThemeProvider';
 import type { CreateTripInput } from '../../types';
 
 interface TripFormProps {
@@ -20,6 +20,7 @@ export function TripForm({
   onDelete,
   submitLabel = 'Сохранить',
 }: TripFormProps) {
+  const { colors } = useAppTheme();
   const [title, setTitle] = useState(initialValues.title);
   const [description, setDescription] = useState(initialValues.description);
   const [startDate, setStartDate] = useState(initialValues.startDate);
@@ -80,7 +81,7 @@ export function TripForm({
         {submitLabel}
       </Button>
       {onDelete ? (
-        <Button mode="outlined" textColor={UI.error} onPress={onDelete}>
+        <Button mode="outlined" textColor={colors.error} onPress={onDelete}>
           Удалить поездку
         </Button>
       ) : null}

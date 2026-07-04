@@ -4,7 +4,7 @@ import { Button } from 'react-native-paper';
 
 import { PickContactDialog } from './PickContactDialog';
 import { FormPanel, PaperTextInput } from '../PaperTextInput';
-import { UI } from '../../constants/ui';
+import { useAppTheme } from '../../contexts/ThemeProvider';
 import {
   mapDeviceContactToCompanionInput,
   pickDeviceContactNative,
@@ -25,6 +25,7 @@ export function CompanionForm({
   onDelete,
   submitLabel = 'Сохранить',
 }: CompanionFormProps) {
+  const { colors } = useAppTheme();
   const [name, setName] = useState(initialValues.name);
   const [phone, setPhone] = useState(initialValues.phone);
   const [email, setEmail] = useState(initialValues.email);
@@ -110,7 +111,7 @@ export function CompanionForm({
       </Button>
 
       {onDelete ? (
-        <Button mode="outlined" textColor={UI.error} onPress={onDelete} style={styles.button}>
+        <Button mode="outlined" textColor={colors.error} onPress={onDelete} style={styles.button}>
           Удалить
         </Button>
       ) : null}

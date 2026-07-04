@@ -8,11 +8,13 @@ import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadingIndicator } from '../../components/LoadingIndicator';
 import { ScreenLayout } from '../../components/ScreenLayout';
-import { paperSearchbarStyle } from '../../constants/ui';
+import { useAppTheme } from '../../contexts/ThemeProvider';
+import { getPaperSearchbarStyle } from '../../constants/ui';
 import { useCompanions } from '../../hooks/useCompanions';
 import type { Companion } from '../../types';
 
 export default function CompanionsListScreen() {
+  const { colors } = useAppTheme();
   const { companions, isLoading, refreshCompanions, removeCompanion } = useCompanions();
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<Companion | null>(null);
@@ -67,7 +69,7 @@ export default function CompanionsListScreen() {
         placeholder="Поиск по имени, телефону, email"
         value={searchQuery}
         onChangeText={setSearchQuery}
-        style={paperSearchbarStyle}
+        style={getPaperSearchbarStyle(colors)}
       />
 
       {filteredCompanions.length === 0 ? (

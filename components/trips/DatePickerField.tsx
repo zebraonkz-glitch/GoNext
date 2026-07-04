@@ -3,7 +3,8 @@ import { Platform, StyleSheet, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Button, Modal, Portal, Text } from 'react-native-paper';
 
-import { UI, paperInputStyle } from '../../constants/ui';
+import { useAppTheme } from '../../contexts/ThemeProvider';
+import { getPaperInputStyle } from '../../constants/ui';
 import { formatDate, parseISODate, toISODateString } from '../../utils/dates';
 
 interface DatePickerFieldProps {
@@ -13,6 +14,7 @@ interface DatePickerFieldProps {
 }
 
 export function DatePickerField({ label, value, onChange }: DatePickerFieldProps) {
+  const { colors } = useAppTheme();
   const [visible, setVisible] = useState(false);
   const [tempDate, setTempDate] = useState<Date>(parseISODate(value) ?? new Date());
 
@@ -48,7 +50,7 @@ export function DatePickerField({ label, value, onChange }: DatePickerFieldProps
     <View style={styles.container}>
       <Text variant="labelLarge">{label}</Text>
       <View style={styles.row}>
-        <Button mode="outlined" onPress={openPicker} style={[styles.button, paperInputStyle]}>
+        <Button mode="outlined" onPress={openPicker} style={[styles.button, getPaperInputStyle(colors)]}>
           {formatDate(value)}
         </Button>
         {value ? (
@@ -70,7 +72,11 @@ export function DatePickerField({ label, value, onChange }: DatePickerFieldProps
 
       {Platform.OS === 'ios' ? (
         <Portal>
-          <Modal visible={visible} onDismiss={closePicker} contentContainerStyle={styles.modal}>
+          <Modal
+            visible={visible}
+            onDismiss={closePicker}
+            contentContainerStyle={[styles.modal, { backgroundColor: colors.surface }]}
+          >
             <Text variant="titleMedium" style={styles.modalTitle}>
               {label}
             </Text>
@@ -106,7 +112,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   modal: {
-    backgroundColor: UI.surface,
     margin: 24,
     borderRadius: 12,
     padding: 16,

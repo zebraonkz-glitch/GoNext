@@ -4,7 +4,8 @@ import { useCallback, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { FAB, Searchbar } from 'react-native-paper';
 
-import { paperInputStyle, paperSearchbarStyle } from '../../constants/ui';
+import { useAppTheme } from '../../contexts/ThemeProvider';
+import { getPaperInputStyle, getPaperSearchbarStyle } from '../../constants/ui';
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadingIndicator } from '../../components/LoadingIndicator';
@@ -16,6 +17,7 @@ import type { Photo, Place } from '../../types';
 
 export default function PlacesListScreen() {
   const db = useSQLiteContext();
+  const { colors } = useAppTheme();
   const { places, isLoading, refreshPlaces, removePlace } = usePlaces();
   const [searchQuery, setSearchQuery] = useState('');
   const [thumbnails, setThumbnails] = useState<Record<string, Photo | null>>({});
@@ -80,8 +82,8 @@ export default function PlacesListScreen() {
               placeholder="Поиск по названию"
               value={searchQuery}
               onChangeText={setSearchQuery}
-              style={[styles.searchbar, paperSearchbarStyle]}
-              inputStyle={paperInputStyle}
+              style={[styles.searchbar, getPaperSearchbarStyle(colors)]}
+              inputStyle={getPaperInputStyle(colors)}
             />
             {filteredPlaces.length === 0 ? (
               <EmptyState

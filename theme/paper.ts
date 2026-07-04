@@ -1,25 +1,36 @@
-import { MD3LightTheme, type MD3Theme } from 'react-native-paper';
+import { MD3DarkTheme, MD3LightTheme, type MD3Theme } from 'react-native-paper';
 
-import { UI } from '../constants/ui';
+import { getAppColors, type ThemeMode } from '../constants/ui';
 
-export const appTheme: MD3Theme = {
-  ...MD3LightTheme,
-  roundness: UI.radius,
-  colors: {
-    ...MD3LightTheme.colors,
-    primary: UI.primary,
-    error: UI.error,
-    background: 'transparent',
-    surface: UI.surface,
-    surfaceVariant: UI.surfaceMuted,
-    elevation: {
-      ...MD3LightTheme.colors.elevation,
-      level0: 'transparent',
-      level1: UI.surface,
-      level2: UI.surface,
-      level3: UI.surface,
-      level4: UI.surface,
-      level5: UI.surface,
+export function createAppTheme(mode: ThemeMode): MD3Theme {
+  const colors = getAppColors(mode);
+  const base = mode === 'dark' ? MD3DarkTheme : MD3LightTheme;
+
+  return {
+    ...base,
+    roundness: colors.radius,
+    dark: mode === 'dark',
+    colors: {
+      ...base.colors,
+      primary: colors.primary,
+      error: colors.error,
+      background: colors.background,
+      surface: colors.surface,
+      surfaceVariant: colors.surfaceMuted,
+      onSurface: mode === 'dark' ? '#E1E1E1' : base.colors.onSurface,
+      onBackground: mode === 'dark' ? '#E1E1E1' : base.colors.onBackground,
+      elevation: {
+        ...base.colors.elevation,
+        level0: colors.background,
+        level1: colors.surface,
+        level2: colors.surface,
+        level3: colors.surface,
+        level4: colors.surface,
+        level5: colors.surface,
+      },
     },
-  },
-};
+  };
+}
+
+/** @deprecated Используйте createAppTheme('light') */
+export const appTheme = createAppTheme('light');

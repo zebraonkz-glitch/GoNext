@@ -4,17 +4,32 @@ import { SQLiteProvider } from 'expo-sqlite';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
-import { PaperProvider } from 'react-native-paper';
 
 import { AppBackground } from '../components/AppBackground';
 import { DataProvider } from '../contexts/DataProvider';
 import { SnackbarProvider } from '../contexts/SnackbarContext';
+import { ThemeProvider, useAppTheme } from '../contexts/ThemeProvider';
 import { DATABASE_NAME } from '../constants';
 import { initDatabase } from '../db/database';
-import { appTheme } from '../theme/paper';
-import { materialCommunityIconFont, paperSettings } from '../theme/paperSettings';
+import { materialCommunityIconFont } from '../theme/paperSettings';
 
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
+
+function RootNavigator() {
+  const { isDark } = useAppTheme();
+
+  return (
+    <AppBackground>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: 'transparent' },
+        }}
+      />
+    </AppBackground>
+  );
+}
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts(materialCommunityIconFont);
@@ -30,22 +45,14 @@ export default function RootLayout() {
   }
 
   return (
-    <PaperProvider theme={appTheme} settings={paperSettings}>
+    <ThemeProvider>
       <SQLiteProvider databaseName={DATABASE_NAME} onInit={initDatabase}>
         <SnackbarProvider>
           <DataProvider>
-            <AppBackground>
-              <StatusBar style="auto" />
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  contentStyle: { backgroundColor: 'transparent' },
-                }}
-              />
-            </AppBackground>
+            <RootNavigator />
           </DataProvider>
         </SnackbarProvider>
       </SQLiteProvider>
-    </PaperProvider>
+    </ThemeProvider>
   );
 }

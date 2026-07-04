@@ -2,12 +2,13 @@ import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import Constants from 'expo-constants';
-import { Button, Divider, List, Text } from 'react-native-paper';
+import { Button, Divider, List, SegmentedButtons, Text } from 'react-native-paper';
 
 import { ConfirmDialog } from '../../components/ConfirmDialog';
 import { FormPanel } from '../../components/PaperTextInput';
 import { ScreenLayout } from '../../components/ScreenLayout';
-import { UI } from '../../constants/ui';
+import { useAppTheme } from '../../contexts/ThemeProvider';
+import { type ThemeMode } from '../../constants/ui';
 import { useData } from '../../contexts/DataProvider';
 import {
   type AppPermission,
@@ -24,6 +25,7 @@ const PERMISSIONS: AppPermission[] = ['location', 'camera', 'mediaLibrary', 'con
 
 export default function SettingsScreen() {
   const { clearAllData } = useData();
+  const { mode, setMode, colors } = useAppTheme();
   const [permissionStates, setPermissionStates] = useState<Record<AppPermission, PermissionState>>({
     location: 'undetermined',
     camera: 'undetermined',
@@ -100,6 +102,25 @@ export default function SettingsScreen() {
         </FormPanel>
 
         <FormPanel style={styles.panel}>
+          <Text variant="titleMedium">Оформление</Text>
+          <Text variant="bodySmall" style={styles.sectionHint}>
+            В тёмной теме фоновое изображение скрывается.
+          </Text>
+          <SegmentedButtons
+            value={mode}
+            onValueChange={(value) => {
+              if (value === 'light' || value === 'dark') {
+                void setMode(value as ThemeMode);
+              }
+            }}
+            buttons={[
+              { value: 'light', label: 'Светлая', icon: 'white-balance-sunny' },
+              { value: 'dark', label: 'Тёмная', icon: 'moon-waning-crescent' },
+            ]}
+          />
+        </FormPanel>
+
+        <FormPanel style={styles.panel}>
           <Text variant="titleMedium">Разрешения</Text>
           <Text variant="bodySmall" style={styles.sectionHint}>
             Управление доступом к геолокации, камере и галерее.
@@ -151,7 +172,7 @@ export default function SettingsScreen() {
           </Text>
           <Button
             mode="outlined"
-            textColor="#b00020"
+            textColor={colors.error}
             icon="delete-forever"
             onPress={() => setClearDialogVisible(true)}
           >
@@ -171,7 +192,10 @@ export default function SettingsScreen() {
 
       {isClearing ? (
         <View style={styles.overlay}>
-          <Text variant="bodyMedium" style={styles.overlayText}>
+          <Text
+            variant="bodyMedium"
+            style={[styles.overlayText, { backgroundColor: colors.surface }]}
+          >
             Очистка данных...
           </Text>
         </View>
@@ -206,7 +230,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   overlayText: {
-    backgroundColor: UI.surface,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 8,

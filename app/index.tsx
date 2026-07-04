@@ -3,11 +3,12 @@ import { StyleSheet, View } from 'react-native';
 import { Appbar, Button } from 'react-native-paper';
 
 import { LoadingIndicator } from '../components/LoadingIndicator';
+import { useAppTheme } from '../contexts/ThemeProvider';
 import { useData } from '../contexts/DataProvider';
-import { UI } from '../constants/ui';
 
 export default function HomeScreen() {
   const { isLoading } = useData();
+  const { colors } = useAppTheme();
 
   if (isLoading) {
     return <LoadingIndicator message="Инициализация..." />;
@@ -15,7 +16,7 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      <Appbar.Header style={styles.header}>
+      <Appbar.Header style={[styles.header, { backgroundColor: colors.headerOverlay }]}>
         <Appbar.Content title="GoNext" />
       </Appbar.Header>
 
@@ -70,9 +71,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
-  header: {
-    backgroundColor: UI.headerOverlay,
-  },
+  header: {},
   menu: {
     flex: 1,
     justifyContent: 'center',

@@ -9,7 +9,7 @@ import { PhotoGallery } from './PhotoGallery';
 import { PlaceMap } from './PlaceMap';
 import { MapActionButtons } from './MapActionButtons';
 import { PlaceCompanionsSection } from '../companions/PlaceCompanionsSection';
-import { UI } from '../../constants/ui';
+import { useAppTheme } from '../../contexts/ThemeProvider';
 import { getCurrentCoordinates } from '../../services/location';
 import type { Companion, CreatePlaceInput, Photo } from '../../types';
 import {
@@ -45,6 +45,7 @@ export function PlaceForm({
   onUnlinkCompanion,
   submitLabel = 'Сохранить',
 }: PlaceFormProps) {
+  const { colors } = useAppTheme();
   const [name, setName] = useState(initialValues.name);
   const [description, setDescription] = useState(initialValues.description);
   const [visitlater, setVisitlater] = useState(initialValues.visitlater);
@@ -249,7 +250,7 @@ export function PlaceForm({
                   <IconButton
                     icon="close-circle"
                     size={20}
-                    style={styles.pendingDelete}
+                    style={[styles.pendingDelete, { backgroundColor: colors.surface }]}
                     onPress={() => setPendingUris((current) => current.filter((_, i) => i !== index))}
                   />
                 </View>
@@ -272,7 +273,7 @@ export function PlaceForm({
       </Button>
 
       {onDelete ? (
-        <Button mode="outlined" textColor={UI.error} onPress={onDelete} style={styles.button}>
+        <Button mode="outlined" textColor={colors.error} onPress={onDelete} style={styles.button}>
           Удалить
         </Button>
       ) : null}
@@ -336,6 +337,5 @@ const styles = StyleSheet.create({
     top: -8,
     right: -8,
     margin: 0,
-    backgroundColor: UI.surface,
   },
 });

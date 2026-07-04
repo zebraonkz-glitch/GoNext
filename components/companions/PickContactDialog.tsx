@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Button, Dialog, Portal, Searchbar, Text } from 'react-native-paper';
 
-import { paperSearchbarStyle } from '../../constants/ui';
+import { useAppTheme } from '../../contexts/ThemeProvider';
+import { getPaperInputStyle, getPaperSearchbarStyle } from '../../constants/ui';
 import { loadDeviceContacts, type DeviceContactPreview } from '../../services/deviceContacts';
 
 interface PickContactDialogProps {
@@ -12,6 +13,7 @@ interface PickContactDialogProps {
 }
 
 export function PickContactDialog({ visible, onDismiss, onSelect }: PickContactDialogProps) {
+  const { colors } = useAppTheme();
   const [contacts, setContacts] = useState<DeviceContactPreview[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -65,7 +67,8 @@ export function PickContactDialog({ visible, onDismiss, onSelect }: PickContactD
             placeholder="Поиск по имени, телефону, email"
             value={searchQuery}
             onChangeText={setSearchQuery}
-            style={[styles.searchbar, paperSearchbarStyle]}
+            style={[styles.searchbar, getPaperSearchbarStyle(colors)]}
+            inputStyle={getPaperInputStyle(colors)}
           />
 
           {isLoading ? (

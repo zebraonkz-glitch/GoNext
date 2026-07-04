@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 import { CoordinatesFallback } from './MapActionButtons';
-import { UI } from '../../constants/ui';
+import { useAppTheme } from '../../contexts/ThemeProvider';
 import type { DecimalDegrees } from '../../types';
 import { hasValidCoordinates } from '../../utils/coordinates';
 import { buildMapHtml } from '../../utils/mapPreview';
@@ -15,7 +15,12 @@ interface PlaceMapProps {
 }
 
 export function PlaceMap({ dd, title, height = 200 }: PlaceMapProps) {
+  const { colors } = useAppTheme();
   const [hasError, setHasError] = useState(false);
+  const mapSurfaceStyle = {
+    borderRadius: colors.radius,
+    backgroundColor: colors.surfaceMuted,
+  };
 
   const latitude = dd.latitude!;
   const longitude = dd.longitude!;
@@ -33,11 +38,11 @@ export function PlaceMap({ dd, title, height = 200 }: PlaceMapProps) {
   }
 
   return (
-    <View style={[styles.container, { height }]}>
+    <View style={[styles.container, mapSurfaceStyle, { height }]}>
       <WebView
         originWhitelist={['*']}
         source={{ html: mapHtml }}
-        style={styles.webview}
+        style={[styles.webview, { backgroundColor: colors.surfaceMuted }]}
         scrollEnabled={false}
         javaScriptEnabled
         domStorageEnabled
@@ -50,12 +55,9 @@ export function PlaceMap({ dd, title, height = 200 }: PlaceMapProps) {
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: UI.radius,
     overflow: 'hidden',
-    backgroundColor: UI.surfaceMuted,
   },
   webview: {
     flex: 1,
-    backgroundColor: UI.surfaceMuted,
   },
 });

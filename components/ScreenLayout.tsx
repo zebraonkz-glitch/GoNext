@@ -3,7 +3,8 @@ import { ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Appbar } from 'react-native-paper';
 
-import { UI } from '../constants/ui';
+import { useAppTheme } from '../contexts/ThemeProvider';
+
 interface ScreenLayoutProps {
   title: string;
   children: ReactNode;
@@ -11,9 +12,11 @@ interface ScreenLayoutProps {
 }
 
 export function ScreenLayout({ title, children, showBack = true }: ScreenLayoutProps) {
+  const { colors } = useAppTheme();
+
   return (
     <View style={styles.container}>
-      <Appbar.Header style={styles.header}>
+      <Appbar.Header style={[styles.header, { backgroundColor: colors.headerOverlay }]}>
         {showBack ? <Appbar.BackAction onPress={() => router.back()} /> : null}
         <Appbar.Content title={title} />
       </Appbar.Header>
@@ -30,7 +33,5 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'transparent',
   },
-  header: {
-    backgroundColor: UI.headerOverlay,
-  },
+  header: {},
 });
