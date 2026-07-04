@@ -14,7 +14,7 @@ export interface BuiltInBackgroundOption {
 export const BUILT_IN_BACKGROUNDS: BuiltInBackgroundOption[] = [
   {
     id: 'default',
-    source: require('../assets/backgrounds/gonext-bg.png'),
+    source: require('../assets/backgrounds/gonext-bg.jpg'),
   },
 ];
 

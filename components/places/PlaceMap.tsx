@@ -1,18 +1,20 @@
 import { useMemo, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { WebView } from 'react-native-webview';
+import { Image, StyleSheet, View } from 'react-native';
+import { Icon } from 'react-native-paper';
 
 import { CoordinatesFallback } from './MapActionButtons';
 import { useAppTheme } from '../../contexts/ThemeProvider';
 import type { DecimalDegrees } from '../../types';
 import { hasValidCoordinates } from '../../utils/coordinates';
-import { buildMapHtml } from '../../utils/mapPreview';
+import { getMarkerOffsetInTile, getStaticMapTileUrl } from '../../utils/staticMap';
 
 interface PlaceMapProps {
   dd: DecimalDegrees;
   title?: string;
   height?: number;
 }
+
+const MAP_ZOOM = 15;
 
 export function PlaceMap({ dd, title, height = 200 }: PlaceMapProps) {
   const { colors } = useAppTheme();
@@ -24,10 +26,15 @@ export function PlaceMap({ dd, title, height = 200 }: PlaceMapProps) {
 
   const latitude = dd.latitude!;
   const longitude = dd.longitude!;
-  const mapHtml = useMemo(
-    () => buildMapHtml(latitude, longitude, title),
-    [latitude, longitude, title]
+
+  const tileUrl = useMemo(
+    () => getStaticMapTileUrl(latitude, longitude, MAP_ZOOM),
+    [latitude, longitude]
   );
+
+  const markerPosition = useMemo(() => {
+    return getMarkerOffsetInTile(latitude, longitude, MAP_ZOOM, 400, height);
+  }, [latitude, longitude, height]);
 
   if (!hasValidCoordinates(dd.latitude, dd.longitude)) {
     return <CoordinatesFallback dd={dd} title={title} height={height} />;
@@ -39,16 +46,24 @@ export function PlaceMap({ dd, title, height = 200 }: PlaceMapProps) {
 
   return (
     <View style={[styles.container, mapSurfaceStyle, { height }]}>
-      <WebView
-        originWhitelist={['*']}
-        source={{ html: mapHtml }}
-        style={[styles.webview, { backgroundColor: colors.surfaceMuted }]}
-        scrollEnabled={false}
-        javaScriptEnabled
-        domStorageEnabled
+      <Image
+        source={{ uri: tileUrl }}
+        style={styles.mapImage}
+        resizeMode="cover"
         onError={() => setHasError(true)}
-        onHttpError={() => setHasError(true)}
       />
+      <View
+        style={[
+          styles.marker,
+          {
+            left: markerPosition.left - 12,
+            top: markerPosition.top - 24,
+          },
+        ]}
+        pointerEvents="none"
+      >
+        <Icon source="map-marker" size={24} color={colors.primary} />
+      </View>
     </View>
   );
 }
@@ -56,8 +71,13 @@ export function PlaceMap({ dd, title, height = 200 }: PlaceMapProps) {
 const styles = StyleSheet.create({
   container: {
     overflow: 'hidden',
+    position: 'relative',
   },
-  webview: {
-    flex: 1,
+  mapImage: {
+    width: '100%',
+    height: '100%',
+  },
+  marker: {
+    position: 'absolute',
   },
 });
